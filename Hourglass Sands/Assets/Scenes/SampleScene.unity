@@ -572,7 +572,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eea1953671ebf6f43a1a83b9d30836b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Show:
+  showCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -596,12 +596,12 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  Hide:
+  hideCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 1
+      time: 0.0071411133
+      value: 1.0020142
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -609,17 +609,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.30748707
-      value: 1.1052012
-      inSlope: 0.045507923
-      outSlope: 0.045507923
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.99972534
-      value: 0.00002670288
+      time: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -629,9 +620,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  AnimationSpeed: 2
-  Panel_Trading: {fileID: 1333740063}
-  Panel_Inventory: {fileID: 1160344701}
+  animationSpeed: 1
+  merchantPanel: {fileID: 1333740063}
+  inventoryPanel: {fileID: 1160344701}
+  playerCamera: {fileID: 330585545}
+  interactRange: 5
 --- !u!4 &393237076
 Transform:
   m_ObjectHideFlags: 0

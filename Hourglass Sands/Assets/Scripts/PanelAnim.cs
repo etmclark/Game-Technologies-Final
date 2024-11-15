@@ -6,15 +6,19 @@ public class PanelAnim : MonoBehaviour
     public AnimationCurve showCurve;
     public AnimationCurve hideCurve;
     public float animationSpeed;
-    public GameObject panel;
+    public GameObject merchantPanel;
+    public GameObject inventoryPanel;
     public Camera playerCamera; 
-    public float interactRange = 5f; 
+    public float interactRange = 15f; 
     private GameObject lookingAtMerchant = null; 
     private bool isPanelVisible = false;
 
+    private GameObject openPanel;
+
     void Update()
     {
-         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, interactRange)) {
+        Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * interactRange);
+        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, interactRange)) {
             if (hit.collider.CompareTag("Merchant"))  {
                 lookingAtMerchant = hit.collider.gameObject; 
             } else {
@@ -24,12 +28,17 @@ public class PanelAnim : MonoBehaviour
             lookingAtMerchant = null;
         }
      
-        if (lookingAtMerchant != null && Input.GetKeyDown(KeyCode.M) && !isPanelVisible) {
-            StartCoroutine(ShowPanel(panel));
-            Time.timeScale = 0; 
-        } else if (Input.GetKeyDown(KeyCode.Escape) && isPanelVisible) {
-            StartCoroutine(HidePanel(panel));
+        if (Input.GetKeyDown(KeyCode.Escape) && isPanelVisible) {
+            StartCoroutine(HidePanel(openPanel));
             Time.timeScale = 1; 
+        } else if (lookingAtMerchant != null && Input.GetKeyDown(KeyCode.M) && !isPanelVisible) {
+            StartCoroutine(ShowPanel(merchantPanel));
+            Time.timeScale = 0; 
+            openPanel = merchantPanel;
+        } else if(Input.GetKeyDown(KeyCode.I) && !isPanelVisible) {
+            StartCoroutine(ShowPanel(inventoryPanel));
+            Time.timeScale = 0; 
+            openPanel = inventoryPanel;
         }
     }
 
