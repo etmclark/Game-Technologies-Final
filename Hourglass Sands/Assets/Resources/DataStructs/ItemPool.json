@@ -1,0 +1,39 @@
+{
+    "items": [
+        {
+            "id": 0,
+            "name": "Apple",
+            "description": "Apple",
+            "iconFile": "12",
+            "basePrice": 2.0
+        },
+        {
+            "id": 1,
+            "name": "Pear",
+            "description": "Apple",
+            "iconFile": "9",
+            "basePrice": 3.5
+        },
+        {
+            "id": 2,
+            "name": "Starfruit",
+            "description": "Apple",
+            "iconFile": "21",
+            "basePrice": 20.0
+        },
+        {
+            "id": 3,
+            "name": "Fig",
+            "description": "Apple",
+            "iconFile": "1",
+            "basePrice": 1.0
+        },
+        {
+            "id": 4,
+            "name": "Avocado",
+            "description": "Apple",
+            "iconFile": "1",
+            "basePrice": 6.0
+        }
+    ]
+}
