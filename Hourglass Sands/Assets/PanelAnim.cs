@@ -23,6 +23,31 @@ public class PanelAnim : MonoBehaviour
     private bool isAnimatingInventory = false;
     private bool isShowingInventory = false;
 
+    public void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.M) && !isAnimatingTrading && !isShowingTrading)
+        {
+            StartCoroutine(ShowPanel_Trading());
+        }
+
+        if (Input.GetKeyUp(KeyCode.I) && !isAnimatingInventory && !isShowingInventory)
+        {
+            StartCoroutine(ShowPanel_Inventory());
+        }
+
+        if (Input.GetKeyUp(KeyCode.Escape))
+        {
+            if (isShowingTrading && !isAnimatingTrading)
+            {
+                StartCoroutine(HidePanel_Trading());
+            }
+            else if (isShowingInventory && !isAnimatingInventory)
+            {
+                StartCoroutine(HidePanel_Inventory());
+            }
+        }
+    }
+
     IEnumerator ShowPanel_Trading()
     {
         if (isShowingInventory && !isAnimatingInventory)
@@ -123,31 +148,6 @@ public class PanelAnim : MonoBehaviour
             yield return null;
         }
         isPanelVisible = false;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyUp(KeyCode.M) && !isAnimatingTrading && !isShowingTrading)
-        {
-            StartCoroutine(ShowPanel_Trading());
-        }
-
-        if (Input.GetKeyUp(KeyCode.I) && !isAnimatingInventory && !isShowingInventory)
-        {
-            StartCoroutine(ShowPanel_Inventory());
-        }
-
-        if (Input.GetKeyUp(KeyCode.Escape))
-        {
-            if (isShowingTrading && !isAnimatingTrading)
-            {
-                StartCoroutine(HidePanel_Trading());
-            }
-            else if (isShowingInventory && !isAnimatingInventory)
-            {
-                StartCoroutine(HidePanel_Inventory());
-            }
-        }
     }
 
     void FreezeGame()
