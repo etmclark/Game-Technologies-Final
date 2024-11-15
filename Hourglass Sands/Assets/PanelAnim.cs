@@ -2,6 +2,9 @@ using System.Collections;
 using UnityEngine;
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
 public class Anime : MonoBehaviour
 {
     public AnimationCurve Show;
@@ -91,6 +94,7 @@ public class Anime : MonoBehaviour
         isShowingInventory = false;
 
         UnfreezeGame();
+<<<<<<< Updated upstream
 =======
 public class PanelAnim : MonoBehaviour
 {
@@ -127,11 +131,16 @@ public class PanelAnim : MonoBehaviour
         }
         isPanelVisible = false;
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
     }
 
     private void Update()
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+>>>>>>> Stashed changes
         if (Input.GetKeyUp(KeyCode.M) && !isAnimatingTrading && !isShowingTrading)
         {
             StartCoroutine(ShowPanel_Trading());
@@ -163,6 +172,7 @@ public class PanelAnim : MonoBehaviour
     void UnfreezeGame()
     {
         Time.timeScale = 1f;
+<<<<<<< Updated upstream
 =======
         
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, interactRange))
@@ -192,6 +202,8 @@ public class PanelAnim : MonoBehaviour
             StartCoroutine(HidePanel(panel));
             Time.timeScale = 1; 
         }
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 }
