@@ -286,7 +286,7 @@ GameObject:
   - component: {fileID: 146300367}
   m_Layer: 0
   m_Name: Capsule-merchant
-  m_TagString: Untagged
+  m_TagString: Merchant
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -624,7 +624,7 @@ MonoBehaviour:
   merchantPanel: {fileID: 1333740063}
   inventoryPanel: {fileID: 1160344701}
   playerCamera: {fileID: 330585545}
-  interactRange: 5
+  interactRange: 18
 --- !u!4 &393237076
 Transform:
   m_ObjectHideFlags: 0
