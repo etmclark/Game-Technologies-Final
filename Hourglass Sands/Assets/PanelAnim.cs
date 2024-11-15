@@ -1,12 +1,17 @@
 using System.Collections;
 using UnityEngine;
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
-public class Anime : MonoBehaviour
+public class PanelAnim : MonoBehaviour
 {
+    public AnimationCurve showCurve;
+    public AnimationCurve hideCurve;
+    public float animationSpeed;
+    public GameObject panel;
+    public Camera playerCamera; 
+    public float interactRange = 5f; 
+    private GameObject lookingAtMerchant = null; 
+
+    private bool isPanelVisible = false;
+
     public AnimationCurve Show;
     public AnimationCurve Hide;
     public float AnimationSpeed;
@@ -94,19 +99,7 @@ public class Anime : MonoBehaviour
         isShowingInventory = false;
 
         UnfreezeGame();
-<<<<<<< Updated upstream
-=======
-public class PanelAnim : MonoBehaviour
-{
-    public AnimationCurve showCurve;
-    public AnimationCurve hideCurve;
-    public float animationSpeed;
-    public GameObject panel;
-    public Camera playerCamera; 
-    public float interactRange = 5f; 
-    private GameObject lookingAtMerchant = null; 
-
-    private bool isPanelVisible = false;
+    }
 
     IEnumerator ShowPanel(GameObject gameObject)
     {
@@ -130,17 +123,10 @@ public class PanelAnim : MonoBehaviour
             yield return null;
         }
         isPanelVisible = false;
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     }
 
     private void Update()
     {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
->>>>>>> Stashed changes
         if (Input.GetKeyUp(KeyCode.M) && !isAnimatingTrading && !isShowingTrading)
         {
             StartCoroutine(ShowPanel_Trading());
@@ -172,9 +158,6 @@ public class PanelAnim : MonoBehaviour
     void UnfreezeGame()
     {
         Time.timeScale = 1f;
-<<<<<<< Updated upstream
-=======
-        
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, interactRange))
         {
             if (hit.collider.CompareTag("Merchant")) 
@@ -202,8 +185,5 @@ public class PanelAnim : MonoBehaviour
             StartCoroutine(HidePanel(panel));
             Time.timeScale = 1; 
         }
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
     }
 }
