@@ -21,7 +21,11 @@ public class ContentMediator : MonoBehaviour
         }
     }
 
-    
+    public void LoadFromInventory(InventoryComponent inventory) {
+        foreach (InventoryItem item in inventory.itemInventory) {
+            AddButton(item.id, item.amount);
+        }
+    }
 
     void RefreshButtonParents() {
         for (int i = 0; i < buttons.Count; i++) {
@@ -29,17 +33,23 @@ public class ContentMediator : MonoBehaviour
         }
     }
 
-    void AddButton(int itemID) {
-        GameObject newButton = Instantiate(buttonPrefab);
-        newButton.GetComponent<ItemButton>().LoadItem(itemPool.items[itemID]);
-        int index = buttons.Count;
-        buttons.Add(newButton);
-        newButton.transform.parent = contentList[index].transform;
+    void AddButton(int itemID, int itemCount) {
+        if (itemCount > 0) {
+            GameObject newButton = Instantiate(buttonPrefab);
+            //I get to name it buttscript, as a treat
+            ItemButton buttScript = newButton.GetComponent<ItemButton>();
+            int index = buttons.Count;
+            buttScript.butIndex = index;
+            buttScript.conMed = this;
+            buttScript.LoadItem(itemPool.items[itemID], itemCount);
+            buttons.Add(newButton);
+            newButton.transform.parent = contentList[index].transform;
+        }
     }
 
-    void InsertButton(int buttonIndex, int itemID) {
+    void InsertButton(int buttonIndex, int itemID, int itemCount) {
         GameObject newButton = Instantiate(buttonPrefab);
-        newButton.GetComponent<ItemButton>().LoadItem(itemPool.items[itemID]);
+        newButton.GetComponent<ItemButton>().LoadItem(itemPool.items[itemID], itemCount);
         buttons.Insert(buttonIndex, newButton);
         RefreshButtonParents();
     }
