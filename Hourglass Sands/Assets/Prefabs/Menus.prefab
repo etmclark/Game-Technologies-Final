@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f9fbce26f27ee24d9ce49a4da3786ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minRows: 5
+  minRows: 4
   rowSize: 7
   contentPanel: {fileID: 3155266020086964804}
   contentContainerPrefab: {fileID: 6942878598754685944, guid: 1745a579bf5867844acea53802ca8907,
@@ -878,10 +878,9 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   animationSpeed: 1
+  pInventoryPanel: {fileID: 2089823623040480385}
+  mInventoryPanel: {fileID: 0}
   merchantPanel: {fileID: 3770332592838840738}
-  inventoryPanel: {fileID: 2089823623040480385}
-  playerCamera: {fileID: 0}
-  interactRange: 18
 --- !u!1 &9169718221664615831
 GameObject:
   m_ObjectHideFlags: 0

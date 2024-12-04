@@ -12,7 +12,7 @@ public class ItemButton : MonoBehaviour
     public int butIndex = 0;
     private RawImage imageComponent;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         imageComponent = imageObject.GetComponent<RawImage>();
     }
