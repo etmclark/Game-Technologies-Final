@@ -52,8 +52,12 @@ MonoBehaviour:
   minRows: 5
   rowSize: 7
   contentPanel: {fileID: 3155266020086964804}
-  contentContainerPrefab: {fileID: 8431196370580138584, guid: 838e3b7b4f0b4e04181afc6e136e6461,
+  contentContainerPrefab: {fileID: 6942878598754685944, guid: 1745a579bf5867844acea53802ca8907,
     type: 3}
+  contentList: []
+  buttonPrefab: {fileID: 8431196370580138584, guid: 838e3b7b4f0b4e04181afc6e136e6461,
+    type: 3}
+  buttons: []
 --- !u!1 &3155266020086964804
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,7 +570,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.92068446, b: 0.57547164, a: 1}
+  m_Color: {r: 0.82210237, g: 0.6445968, b: 0.35343748, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -721,6 +725,7 @@ GameObject:
   - component: {fileID: 8774070622372791}
   - component: {fileID: 2781650105507176849}
   - component: {fileID: 366837795136998889}
+  - component: {fileID: 6114733910833390279}
   m_Layer: 5
   m_Name: Menus
   m_TagString: Untagged
@@ -812,6 +817,71 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &6114733910833390279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7554075068845781895}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eea1953671ebf6f43a1a83b9d30836b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  hideCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.0071411133
+      value: 1.0020142
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  animationSpeed: 1
+  merchantPanel: {fileID: 3770332592838840738}
+  inventoryPanel: {fileID: 2089823623040480385}
+  playerCamera: {fileID: 0}
+  interactRange: 18
 --- !u!1 &9169718221664615831
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,7 +939,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 0
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 30
+  m_ScrollSensitivity: 20
   m_Viewport: {fileID: 226568242778736530}
   m_HorizontalScrollbar: {fileID: 0}
   m_VerticalScrollbar: {fileID: 7960973827896686365}

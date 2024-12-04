@@ -35,6 +35,9 @@ public class ContentMediator : MonoBehaviour
 
     void AddButton(int itemID, int itemCount) {
         if (itemCount > 0) {
+            if (itemID > contentList.Count) {
+                this.AddRow();
+            }
             GameObject newButton = Instantiate(buttonPrefab);
             //I get to name it buttscript, as a treat
             ItemButton buttScript = newButton.GetComponent<ItemButton>();
@@ -67,6 +70,7 @@ public class ContentMediator : MonoBehaviour
     }
 
     void AddRow() {
+        Debug.Log("Row");
         if (contentPanel != null) {
             for(int i = 0; i < rowSize; i++) {
                 GameObject newChild = Instantiate(contentContainerPrefab);
