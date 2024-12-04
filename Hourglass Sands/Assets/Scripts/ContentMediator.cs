@@ -5,8 +5,8 @@ using UnityEngine;
 public class ContentMediator : MonoBehaviour
 {
     // Start is called before the first frame update
-    public int minRows = 0;
-    public int rowSize = 1;
+    public int minRows;
+    public int rowSize;
     public GameObject contentPanel;
     public GameObject contentContainerPrefab;
     public List<GameObject> contentList = new();
@@ -19,6 +19,7 @@ public class ContentMediator : MonoBehaviour
         for (int i = 0; i < minRows; i++) {
             this.AddRow();
         }
+        gameObject.SetActive(false);
     }
 
     public void LoadFromInventory(InventoryComponent inventory) {
@@ -29,12 +30,15 @@ public class ContentMediator : MonoBehaviour
 
     void RefreshButtonParents() {
         for (int i = 0; i < buttons.Count; i++) {
-            buttons[i].transform.parent = contentList[i].transform.parent;
+            buttons[i].transform.SetParent(contentList[i].transform, false);
         }
     }
 
     void AddButton(int itemID, int itemCount) {
         if (itemCount > 0) {
+            if (itemID > contentList.Count) {
+                this.AddRow();
+            }
             GameObject newButton = Instantiate(buttonPrefab);
             //I get to name it buttscript, as a treat
             ItemButton buttScript = newButton.GetComponent<ItemButton>();
@@ -43,7 +47,7 @@ public class ContentMediator : MonoBehaviour
             buttScript.conMed = this;
             buttScript.LoadItem(itemPool.items[itemID], itemCount);
             buttons.Add(newButton);
-            newButton.transform.parent = contentList[index].transform;
+            newButton.transform.SetParent(contentList[index].transform, false);
         }
     }
 
@@ -59,7 +63,7 @@ public class ContentMediator : MonoBehaviour
         RefreshButtonParents();
     }
 
-    void ClearButtons() {
+    public void ClearButtons() {
         for(int i = 0; i < buttons.Count; i++) {
             Destroy(buttons[i]);
         }
@@ -67,6 +71,7 @@ public class ContentMediator : MonoBehaviour
     }
 
     void AddRow() {
+        Debug.Log("Row");
         if (contentPanel != null) {
             for(int i = 0; i < rowSize; i++) {
                 GameObject newChild = Instantiate(contentContainerPrefab);
