@@ -1,0 +1,2 @@
+Credits:
+jungle-animal-sound-fx: https://assetstore.unity.com/packages/audio/sound-fx/animals/jungle-animal-sound-fx-13491

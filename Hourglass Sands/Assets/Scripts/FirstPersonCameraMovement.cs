@@ -34,4 +34,4 @@ public class FirstPersonCamera : MonoBehaviour
         // Rotate the player body horizontally (left/right)
         playerBody.Rotate(Vector3.up * mouseX);
     }
-}
+} 
