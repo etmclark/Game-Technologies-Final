@@ -19,3 +19,11 @@ public enum ItemAction {
     DISCARD,
     
 }
+
+public enum Town {
+    Vorbeck,
+    Kybeck,
+    Noor,
+    Oumnia,
+    Lygash
+}

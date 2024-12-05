@@ -14,12 +14,29 @@ public class GenerativeInventory : InventoryComponent
     private float cBaseAppearance = 0.3f;
     private float cBaseCount = 4f;
 
+
     private float weightCoeff = 1.5f;
     private ItemPoolReader itemPoolReader;
     public void Start() {
         mInt = GetComponent<MerchantInteractable>();
         cInt = GetComponent<CacheInteractable>();
         itemPoolReader = FindObjectOfType<ItemPoolReader>();
+    }
+
+    public static string TownToName(Town townEnum) {
+        switch(townEnum) {
+            case Town.Oumnia:
+                return "Oumnia";
+            case Town.Lygash:
+                return "Lygash";
+            case Town.Kybeck:
+                return "Kybeck Laesh";
+            case Town.Vorbeck:
+                return "Vorbek Laesh";
+            case Town.Noor:
+                return "Noor Vaesh";
+        }
+        return "";
     }
 
     public void ClearInventory() {
@@ -43,8 +60,8 @@ public class GenerativeInventory : InventoryComponent
         if(mInt != null) {
             Debug.Log("Trade");
             ClearInventory();
-            if(scarcityMap.ContainsKey(mInt.location)) {
-                Dictionary<int, float> innerDict = scarcityMap.GetValueOrDefault(mInt.location);
+            if(scarcityMap.ContainsKey(TownToName(mInt.location))) {
+                Dictionary<int, float> innerDict = scarcityMap.GetValueOrDefault(TownToName(mInt.location));
                 foreach (GoodsItem item in itemPoolReader.itemPool.items) {
                     float scarcity = innerDict[item.id];
                     if(Random.Range(0f, 1f) > mBaseAppearance * scarcity) {

@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 public class ScarcityGeneration : MonoBehaviour
 {
     // Start is called before the first frame update
-    Dictionary<string, Dictionary<int, float>> scarcityMap = new();
+    public Dictionary<string, Dictionary<int, float>> scarcityMap = new();
     ItemPoolReader itemPoolReader;
     public TextAsset POIFile;
     private SettlementList locationData;

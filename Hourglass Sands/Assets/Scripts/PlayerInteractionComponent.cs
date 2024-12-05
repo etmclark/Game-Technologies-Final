@@ -20,6 +20,22 @@ public class PlayerInteractionComponent : MonoBehaviour
         StartCoroutine(LookAt());
     }
 
+    void Update() {
+        if(Input.GetKeyDown(KeyCode.I)) {
+            Debug.Log("pressed");
+            OI();
+        }
+        if(Input.GetKeyDown(KeyCode.Escape)) {
+            SM();
+        }
+        if(Input.GetKeyDown(KeyCode.E)) {
+            IN();
+        }
+        if(Input.GetMouseButtonDown(0)) {
+            CL();
+        }
+    }
+
     // Update is called once per frame
     IEnumerator LookAt() {
         for(;;) {
@@ -41,25 +57,41 @@ public class PlayerInteractionComponent : MonoBehaviour
 
     public void OpenInventory(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
-            menuController.OpenInventory(playerInventory);
+            OI();
         }
     }
 
     public void StartMenu(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
-            menuController.StartMenu();
+            SM();
         }
     }
 
     public void Interact(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
-            lookAtInteractable?.OnInteract(this);
+            IN();
         }
     }
 
     public void Click(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
-            menuController.OnMouseClick();
+            CL();
         }
+    }
+
+    public void OI() {
+        menuController.OpenInventory(playerInventory);
+    }
+
+    public void SM() {
+        menuController.StartMenu();
+    }
+
+    public void IN() {
+        lookAtInteractable?.OnInteract(this);
+    }
+
+    public void CL() {
+        menuController.OnMouseClick();
     }
 }

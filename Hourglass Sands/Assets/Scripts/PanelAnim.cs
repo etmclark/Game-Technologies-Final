@@ -46,7 +46,9 @@ public class PanelAnim : MonoBehaviour
     private GameObject discardPanel;
     private GameObject weightPanel = null;
     private GameObject moneyPanel = null;
-
+    private ScarcityGeneration scarcityGen = null;
+    private MerchantInteractable mI;
+    private BarGradient thirstBar;
     void Start() {
         HideTooltip();
         itemReader = FindObjectOfType<ItemPoolReader>();
@@ -59,12 +61,16 @@ public class PanelAnim : MonoBehaviour
         depositPanel = actionsWindow.transform.Find("Deposit").gameObject;
         consumePanel = actionsWindow.transform.Find("Consume").gameObject;
         discardPanel = actionsWindow.transform.Find("Discard").gameObject;
+        scarcityGen = FindObjectOfType<ScarcityGeneration>();
+        thirstBar = FindObjectOfType<BarGradient>();
     }
 
     IEnumerator ShowPanel(GameObject gameObject)
     {
         float timer = 0;
         animating = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         if(tooltipEnabled) {
             HideTooltip(false);
         }
@@ -78,6 +84,8 @@ public class PanelAnim : MonoBehaviour
 
     IEnumerator HidePanel(GameObject gameObject)
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         float timer = 0;
         animating = true;
         while (timer <= 1) {
@@ -156,7 +164,7 @@ public class PanelAnim : MonoBehaviour
     public void RefreshBuy() {
         if(buyPanel.activeSelf) {
             GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-            if(itemFeatures.basePrice > playerInventory.currency) {
+            if(modifyPrice(itemFeatures.basePrice) > playerInventory.currency) {
                 buyPanel.GetComponent<Button>().enabled = false;
             }
         }
@@ -329,8 +337,8 @@ public class PanelAnim : MonoBehaviour
         } else {
             thirstPanel.SetActive(false);
         }
-        weightPanel.GetComponent<TMP_Text>().text = "Weight: " + itemFeatures.weight.ToString();
-        valuePanel.GetComponent<TMP_Text>().text = "Value: " + itemFeatures.basePrice.ToString();
+        weightPanel.GetComponent<TMP_Text>().text = "Weight: " + itemFeatures.weight.ToString("0.0");
+        valuePanel.GetComponent<TMP_Text>().text = "Value: " + modifyPrice(itemFeatures.basePrice).ToString("0.0");
 
         //Align Window
         if(rT != null) {
@@ -480,7 +488,7 @@ public class PanelAnim : MonoBehaviour
         // playerInventory.itemInventory[buttIndex].amount -= 1;
         // actionsClicked.DecrementAmount();
         inventoryInteracting.RemoveItem(actionsClicked.item.id, 1);
-        playerInventory.PurchaseItem(actionsClicked.item.id, 1, itemFeatures.basePrice);
+        playerInventory.PurchaseItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice));
 
     }
 
@@ -491,7 +499,7 @@ public class PanelAnim : MonoBehaviour
         // playerInventory.itemInventory[buttIndex].amount -= 1;
         // actionsClicked.DecrementAmount();
         inventoryInteracting.AddItem(actionsClicked.item.id, 1);
-        playerInventory.SellItem(actionsClicked.item.id, 1, itemFeatures.basePrice);
+        playerInventory.SellItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice));
     }
 
     public void Withdraw() {
@@ -511,8 +519,9 @@ public class PanelAnim : MonoBehaviour
     }
     public void Consume() {
         Debug.Log("Consume");
-        // GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
         //Get thirst and add thirst regen of item;
+        thirstBar.refill(itemFeatures.thirstRegen);
         playerInventory.RemoveItem(actionsClicked.item.id, 1);
         //actionsClicked.DecrementAmount();
     }
@@ -523,5 +532,23 @@ public class PanelAnim : MonoBehaviour
         playerInventory.RemoveItem(actionsClicked.item.id, 1);
         // playerInventory.itemInventory[buttIndex].amount -= 1;
         // actionsClicked.DecrementAmount();
+    }
+
+    public float modifyPrice(float basePrice) {
+        Debug.Log("modified");
+        Debug.Log(basePrice + "" + inventoryInteracting + "" + mI);
+        if(inventoryInteracting != null) {
+            if(mI == null) {
+                mI = inventoryInteracting.GetComponent<MerchantInteractable>();
+            }
+            Debug.Log(basePrice + "" + mI);
+            if(mI != null) {
+                Debug.Log(GenerativeInventory.TownToName(mI.location) + "" + actionsClicked.item.id);
+                float scarcity = scarcityGen.scarcityMap[GenerativeInventory.TownToName(mI.location)][actionsClicked.item.id];
+                Debug.Log("scarcity: " + scarcity);
+                return basePrice * scarcity;
+            }
+        }
+        return basePrice;
     }
 }
