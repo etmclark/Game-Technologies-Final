@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3110106429260609538}
   - component: {fileID: 3871246986476524888}
+  - component: {fileID: 8071138016471600807}
   m_Layer: 0
   m_Name: GoodsManager
   m_TagString: Untagged
@@ -45,5 +46,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemsFile: {fileID: 4900000, guid: 8e0e71684929619468bbcc3bf07460eb, type: 3}
-  itemPool:
-    itemPool: []
+--- !u!114 &8071138016471600807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5814197677905337711}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ad41d6032e26a142b3a5267c62844bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  POIFile: {fileID: 4900000, guid: 984ee12d4112c43c981e2234e19dffe4, type: 3}

@@ -120,7 +120,6 @@ namespace StarterAssets
         public float WeightSpeedFactor = 0.5f;  // 1 means no impairment, 0 means movement is fully stopped
 
         [Tooltip("Current weight the player is carrying")]
-        public float CurrentCarryWeight = 0.0f;  // This will be set by the inventory system
 
         private bool IsCurrentDeviceMouse
         {
@@ -225,7 +224,7 @@ namespace StarterAssets
         private void Move()
         {
             // Calculate the movement speed based on weight
-            float weightFactor = Mathf.Clamp01(CurrentCarryWeight / MaxCarryWeight);
+            float weightFactor = Mathf.Clamp01(currentWeight / MaxCarryWeight);
             float impairedSpeed = Mathf.Lerp(1.0f, WeightSpeedFactor, weightFactor);  // Weight factor reduces speed
 
             // Determine the target speed based on input and weight factor
@@ -364,7 +363,7 @@ namespace StarterAssets
         // Method to update the carry weight
         public void UpdateCarryWeight(float weight)
         {
-            CurrentCarryWeight = Mathf.Clamp(weight, 0.0f, MaxCarryWeight);  // Ensure weight is within limits
+            currentWeight = Mathf.Clamp(weight, 0.0f, MaxCarryWeight);  // Ensure weight is within limits
         }
     }
 }

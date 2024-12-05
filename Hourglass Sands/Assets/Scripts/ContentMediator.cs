@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,14 +14,15 @@ public class ContentMediator : MonoBehaviour
     public GameObject buttonPrefab;
     public List<GameObject> buttons = new();
     public List<ItemAction> availableActions = new();
-    private ItemPool itemPool;
+    private ItemPoolReader itemReader;
+    [NonSerialized] public bool sleepy = false;
     void Start()
     {
-        itemPool = FindObjectOfType<ItemPoolReader>().itemPool;
+        itemReader = FindObjectOfType<ItemPoolReader>();
         for (int i = 0; i < minRows; i++) {
             this.AddRow();
         }
-        gameObject.SetActive(false);
+        sleepy = true;
     }
 
     public List<GameObject> LoadFromInventory(InventoryComponent inventory) {
@@ -49,7 +51,7 @@ public class ContentMediator : MonoBehaviour
             buttScript.butIndex = index;
             buttScript.conMed = this;
             buttScript.availableActions = this.availableActions;
-            buttScript.LoadItem(itemPool.items[itemID], itemCount, usingInventory);
+            buttScript.LoadItem(itemReader.itemPool.items[itemID], itemCount, usingInventory);
             buttons.Add(newButton);
             newButton.transform.SetParent(contentList[index].transform, false);
         }

@@ -6,7 +6,7 @@
             "description": "A sweet fruit that does not grow naturally in the desert",
             "iconFile": "12",
             "basePrice": 2.0,
-            "thirstRegen": 1.0,
+            "thirstRegen": 20.0,
             "weight": 0.33
         },
         {
@@ -15,6 +15,7 @@
             "description": "Apple",
             "iconFile": "9",
             "basePrice": 3.5,
+            "thirstRegen": 10.0,
             "weight": 0.5
         },
         {
@@ -23,6 +24,7 @@
             "description": "Apple",
             "iconFile": "21",
             "basePrice": 20.0,
+            "thirstRegen": 15.0,
             "weight": 0.25
         },
         {
@@ -31,6 +33,7 @@
             "description": "Fig",
             "iconFile": "1",
             "basePrice": 1.0,
+            "thirstRegen": 2.0,
             "weight": 0.1
         },
         {

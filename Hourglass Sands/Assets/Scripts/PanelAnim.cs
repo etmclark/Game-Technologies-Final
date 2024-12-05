@@ -4,10 +4,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using StarterAssets;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PanelAnim : MonoBehaviour
@@ -43,8 +45,12 @@ public class PanelAnim : MonoBehaviour
     private GameObject depositPanel;
     private GameObject consumePanel;
     private GameObject discardPanel;
-
-
+    private GameObject weightPanel = null;
+    private GameObject moneyPanel = null;
+    private ScarcityGeneration scarcityGen = null;
+    private MerchantInteractable mI;
+    private BarGradient thirstBar;
+    private ThirdPersonController TPControl;
     void Start() {
         HideTooltip();
         itemReader = FindObjectOfType<ItemPoolReader>();
@@ -57,13 +63,18 @@ public class PanelAnim : MonoBehaviour
         depositPanel = actionsWindow.transform.Find("Deposit").gameObject;
         consumePanel = actionsWindow.transform.Find("Consume").gameObject;
         discardPanel = actionsWindow.transform.Find("Discard").gameObject;
+        scarcityGen = FindObjectOfType<ScarcityGeneration>();
+        thirstBar = FindObjectOfType<BarGradient>();
+        TPControl = FindObjectOfType<ThirdPersonController>();
     }
 
     IEnumerator ShowPanel(GameObject gameObject)
     {
+
         float timer = 0; // set the timer
         animating = true;//flag that animation is in progress
         if (tooltipEnabled) {
+
             HideTooltip(false);
         }
         // Gradually scale the panel until the animation finishs.
@@ -79,8 +90,10 @@ public class PanelAnim : MonoBehaviour
 
     IEnumerator HidePanel(GameObject gameObject)
     {
+
         float timer = 0;// set the timer
         animating = true;//flag the anim is working 
+
         while (timer <= 1) {
             //sclae with the curve
             gameObject.transform.localScale = Vector3.one * hideCurve.Evaluate(timer);
@@ -120,13 +133,37 @@ public class PanelAnim : MonoBehaviour
         }
     }
 
+    public void setWeightAndMoney(GameObject pInvPanel) {
+        Transform dataPanel = pInvPanel.transform.Find("PlayerData");
+        weightPanel = dataPanel.Find("Weight").gameObject;
+        moneyPanel = dataPanel.Find("Money").gameObject;
+    }
+
+    public void updateWeight() {
+        if(weightPanel != null) {
+            float weight = itemReader.itemPool.ComputeWeight(playerInventory.itemInventory.ToArray());
+            weightPanel.GetComponent<TMP_Text>().text = "Weight: " + weight.ToString("0.00") + "/" + TPControl.MaxCarryWeight;
+            TPControl.UpdateCarryWeight(weight);
+        }
+    }
+
+    public void updateMoney() {
+        if(moneyPanel != null) {
+            moneyPanel.GetComponent<TMP_Text>().text = "Gold: " + playerInventory.currency.ToString("0.00");
+        }
+    }
+
     public void RefreshInventory(InventoryComponent inventoryComp, GameObject inventoryPanel) {
         ContentMediator cm = inventoryPanel.GetComponent<ContentMediator>();
         int buttIndex = actionsClicked.butIndex;
+        if(inventoryPanel == mShopPanel) {
+            Debug.Log("OW");
+        }
         cm.ClearButtons();
+        Debug.Log(cm + "<3" + inventoryPanel.name);
         List<GameObject> buttons = cm.LoadFromInventory(inventoryComp);
         AssignPopupDelegates(buttons);
-        if(actionsWindow.activeSelf) {
+        if(actionsWindow.activeSelf && actionsClicked.transform.IsChildOf(inventoryPanel.transform)) {
             actionsClicked = buttons[buttIndex].GetComponent<ItemButton>();
         }
     }
@@ -140,7 +177,7 @@ public class PanelAnim : MonoBehaviour
     public void RefreshBuy() {
         if(buyPanel.activeSelf) {
             GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-            if(itemFeatures.basePrice < playerInventory.currency) {
+            if(modifyPrice(itemFeatures.basePrice, itemFeatures.id) > playerInventory.currency) {
                 buyPanel.GetComponent<Button>().enabled = false;
             }
         }
@@ -149,8 +186,13 @@ public class PanelAnim : MonoBehaviour
     public void OpenInventory(PlayerInventory pInventory) {
         if(!animating && openPanel == null) {
             playerInventory = pInventory;
+            setWeightAndMoney(pInventoryPanel);
+            updateWeight();
+            updateMoney();
             pInventoryPanel.SetActive(true);
             pInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(pInventory, pInventoryPanel);});
+            pInventory.e_InventoryUpdated.AddListener(updateWeight);
+            pInventory.e_CurrencyUpdated.AddListener(updateMoney);
             pInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(pInventoryPanel, i));
             List<GameObject> buttons = pInventoryPanel.GetComponent<ContentMediator>().LoadFromInventory(pInventory);
             AssignPopupDelegates(buttons);
@@ -167,7 +209,22 @@ public class PanelAnim : MonoBehaviour
         if(!animating && openPanel == null) {
             playerInventory = pInventory;
             inventoryInteracting = mInventory;
+            setWeightAndMoney(mInventoryPanel);
+            updateWeight();
+            updateMoney();
             merchantPanel.SetActive(true);
+            mInventoryPanel.SetActive(true);
+            //player side
+            pInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(pInventory, mInventoryPanel);});
+            pInventory.e_InventoryUpdated.AddListener(updateWeight);
+            pInventory.e_CurrencyUpdated.AddListener(updateMoney);
+            pInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(mInventoryPanel, i));
+            //merchant side
+            mInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(mInventory, mShopPanel);});
+            mInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(mShopPanel, i));
+            List<GameObject> buttons = mInventoryPanel.GetComponent<ContentMediator>().LoadFromInventory(pInventory);
+            buttons.AddRange(mShopPanel.GetComponent<ContentMediator>().LoadFromInventory(mInventory));
+            AssignPopupDelegates(buttons);
             StartCoroutine(ShowPanel(merchantPanel));
             Time.timeScale = 0; 
             openPanel = merchantPanel;
@@ -181,10 +238,25 @@ public class PanelAnim : MonoBehaviour
         if(!animating && openPanel == null) {
             playerInventory = pInventory;
             inventoryInteracting = cInventory;
-            merchantPanel.SetActive(true);
+            setWeightAndMoney(lInventoryPanel);
+            updateWeight();
+            updateMoney();
+            lootPanel.SetActive(true);
+            lInventoryPanel.SetActive(true);
+            //player side
+            pInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(pInventory, lInventoryPanel);});
+            pInventory.e_InventoryUpdated.AddListener(updateWeight);
+            pInventory.e_CurrencyUpdated.AddListener(updateMoney);
+            pInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(lInventoryPanel, i));
+            //crate side
+            cInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(cInventory, lCachePanel);});
+            cInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(lCachePanel, i));
+            List<GameObject> buttons = lInventoryPanel.GetComponent<ContentMediator>().LoadFromInventory(pInventory);
+            buttons.AddRange(lCachePanel.GetComponent<ContentMediator>().LoadFromInventory(cInventory));
+            AssignPopupDelegates(buttons);
             StartCoroutine(ShowPanel(lootPanel));
             Time.timeScale = 0; 
-            openPanel = merchantPanel;
+            openPanel = lootPanel;
             openType = MenuType.LOOT_CRATE;
         } else if (!animating && openType == MenuType.LOOT_CRATE) {
             CloseMenu();
@@ -207,28 +279,40 @@ public class PanelAnim : MonoBehaviour
         }
         switch (openType) {
             case MenuType.MERCHANT:
-                Time.timeScale = 1;
+                mInventoryPanel.GetComponent<ContentMediator>().ClearButtons();
+                mShopPanel.GetComponent<ContentMediator>().ClearButtons();
+                openPanel.SetActive(false);
                 playerInventory.e_InventoryUpdated.RemoveAllListeners();
                 playerInventory.e_ItemRemoved.RemoveAllListeners();
+                playerInventory.e_CurrencyUpdated.RemoveAllListeners();
+                inventoryInteracting.e_InventoryUpdated.RemoveAllListeners();
+                inventoryInteracting.e_ItemRemoved.RemoveAllListeners();
                 break;
             case MenuType.PLAYER_INVENTORY:
-                Time.timeScale = 1;
                 pInventoryPanel.GetComponent<ContentMediator>().ClearButtons();
                 openPanel.SetActive(false);
                 playerInventory.e_InventoryUpdated.RemoveAllListeners();
                 playerInventory.e_ItemRemoved.RemoveAllListeners();
+                playerInventory.e_CurrencyUpdated.RemoveAllListeners();
                 break;
             case MenuType.LOOT_CRATE:
+                lInventoryPanel.GetComponent<ContentMediator>().ClearButtons();
+                lCachePanel.GetComponent<ContentMediator>().ClearButtons();
+                openPanel.SetActive(false);
                 playerInventory.e_InventoryUpdated.RemoveAllListeners();
                 playerInventory.e_ItemRemoved.RemoveAllListeners();
-                Time.timeScale = 1;
+                playerInventory.e_CurrencyUpdated.RemoveAllListeners();
+                inventoryInteracting.e_InventoryUpdated.RemoveAllListeners();
+                inventoryInteracting.e_ItemRemoved.RemoveAllListeners();
                 break;
             case MenuType.SETTINGS:
-                Time.timeScale = 1;
                 break;
             default:
                 break;
         }
+        weightPanel = null;
+        moneyPanel = null;
+        Time.timeScale = 1;
         openPanel = null;
         openType = MenuType.NONE;
     }
@@ -236,7 +320,7 @@ public class PanelAnim : MonoBehaviour
     public void StartMenu() {
         if(!animating) {
             if(openPanel == null) {
-                OpenSettings();
+                SceneManager.LoadScene(0);
             } else {
                 CloseMenu();
             }
@@ -266,8 +350,8 @@ public class PanelAnim : MonoBehaviour
         } else {
             thirstPanel.SetActive(false);
         }
-        weightPanel.GetComponent<TMP_Text>().text = "Weight: " + itemFeatures.weight.ToString();
-        valuePanel.GetComponent<TMP_Text>().text = "Value: " + itemFeatures.basePrice.ToString();
+        weightPanel.GetComponent<TMP_Text>().text = "Weight: " + itemFeatures.weight.ToString("0.0");
+        valuePanel.GetComponent<TMP_Text>().text = "Value: " + modifyPrice(itemFeatures.basePrice, itemFeatures.id).ToString("0.0");
 
         //Align Window
         if(rT != null) {
@@ -362,6 +446,7 @@ public class PanelAnim : MonoBehaviour
     }
 
     public void OnMouseClick() {
+        Debug.Log("Click" + actionsClicked);
         if(actionsWindow.activeSelf) {
             List<GameObject> buttonsToCheck;
             switch(openType) {
@@ -413,47 +498,64 @@ public class PanelAnim : MonoBehaviour
     public void Buy() {
         Debug.Log("Buy");
         GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-        int buttIndex = actionsClicked.butIndex;
-        playerInventory.itemInventory[buttIndex].amount -= 1;
-        actionsClicked.DecrementAmount();
+        // int buttIndex = actionsClicked.butIndex;
+        // playerInventory.itemInventory[buttIndex].amount -= 1;
+        // actionsClicked.DecrementAmount();
+        inventoryInteracting.RemoveItem(actionsClicked.item.id, 1);
+        playerInventory.PurchaseItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice, itemFeatures.id));
+
     }
 
     public void Sell() {
         Debug.Log("Sell");
         GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-        int buttIndex = actionsClicked.butIndex;
-        playerInventory.itemInventory[buttIndex].amount -= 1;
-        actionsClicked.DecrementAmount();
+        // int buttIndex = actionsClicked.butIndex;
+        // playerInventory.itemInventory[buttIndex].amount -= 1;
+        // actionsClicked.DecrementAmount();
+        inventoryInteracting.AddItem(actionsClicked.item.id, 1);
+        playerInventory.SellItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice, itemFeatures.id));
     }
 
     public void Withdraw() {
         Debug.Log("Withdraw");
-        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-        int buttIndex = actionsClicked.butIndex;
-        inventoryInteracting.itemInventory[buttIndex].amount -= 1;
-        actionsClicked.DecrementAmount(); 
+        playerInventory.AddItem(actionsClicked.item.id, 1);
+        inventoryInteracting.RemoveItem(actionsClicked.item.id, 1);
     }
 
     public void Deposit() {
         Debug.Log("Deposit");
-        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-        int buttIndex = actionsClicked.butIndex;
-        playerInventory.itemInventory[buttIndex].amount -= 1;
-        actionsClicked.DecrementAmount(); 
+        // GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        // int buttIndex = actionsClicked.butIndex;
+        inventoryInteracting.AddItem(actionsClicked.item.id, 1);
+        playerInventory.RemoveItem(actionsClicked.item.id, 1);
+        // playerInventory.itemInventory[buttIndex].amount -= 1;
+        // actionsClicked.DecrementAmount(); 
     }
     public void Consume() {
         Debug.Log("Consume");
         GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
         //Get thirst and add thirst regen of item;
+        thirstBar?.refill(itemFeatures.thirstRegen);
         playerInventory.RemoveItem(actionsClicked.item.id, 1);
         //actionsClicked.DecrementAmount();
     }
     public void Discard() {
-        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-        int buttIndex = actionsClicked.butIndex; 
+        // GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        // int buttIndex = actionsClicked.butIndex; 
         Debug.Log("Discard");
         playerInventory.RemoveItem(actionsClicked.item.id, 1);
         // playerInventory.itemInventory[buttIndex].amount -= 1;
         // actionsClicked.DecrementAmount();
+    }
+
+    public float modifyPrice(float basePrice, int id) {
+        if(inventoryInteracting != null) {
+            mI = inventoryInteracting.GetComponent<MerchantInteractable>();
+            if(mI != null) {
+                float scarcity = scarcityGen.scarcityMap[mI.returnName()][id];
+                return basePrice * scarcity;
+            }
+        }
+        return basePrice;
     }
 }

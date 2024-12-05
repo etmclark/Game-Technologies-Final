@@ -1,7 +1,24 @@
 {
-    "Noor Vaesh": ["-15", "10"],
-    "Kybeck Laesh": ["800", "15"],
-    "Vorbek Laesh": ["150", "300"],
-    "Oumnia": ["600", "530"],
-    "Lygash": ["280", "705"]
+    "settlements": [ 
+        {
+            "name": "Noor Vaesh",
+            "location": ["-15", "10"]
+        },
+        {
+            "name": "Kybeck Laesh",
+            "location": ["800", "15"]
+        },
+        {
+            "name": "Vorbek Laesh",
+            "location": ["150", "300"]
+        },
+        {
+            "name": "Oumnia",
+            "location": ["600", "530"]
+        },
+        {
+            "name": "Lygash",
+            "location": ["280", "705"]
+        }
+    ]
 }

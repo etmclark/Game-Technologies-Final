@@ -44,6 +44,11 @@ public class BarGradient : MonoBehaviour
         }
     }
 
+    public void refill(float refillValue) {
+        Slider1.value += refillValue;
+        UpdateFillColor(Slider1.value);
+    }
+
     void UpdateFillColor(float value)
     {
         if (fillImage != null)// Check if the fill image is not null
