@@ -28,7 +28,7 @@
         {
             "id": 3,
             "name": "Fig",
-            "description": "Apple",
+            "description": "Fig",
             "iconFile": "1",
             "basePrice": 1.0,
             "weight": 0.1

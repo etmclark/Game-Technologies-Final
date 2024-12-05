@@ -464,6 +464,12 @@ MonoBehaviour:
     amount: 0
   - id: 3
     amount: 2
+  - id: 3
+    amount: 2
+  - id: 3
+    amount: 2
+  - id: 3
+    amount: 2
   currency: 0
 --- !u!1 &146300366
 GameObject:

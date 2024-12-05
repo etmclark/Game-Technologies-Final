@@ -159,13 +159,7 @@ public class PanelAnim : MonoBehaviour
 
     public void DisplayPopup(ItemButton itemButton, RectTransform rT) {
         popupWindow.SetActive(true);
-        Debug.Log(itemReader.itemPool);
         popupHovering = itemButton;
-
-        //Align Window
-        RectTransform pT= popupWindow.GetComponent<RectTransform>();
-        Debug.Log(rT.anchorMax.y);
-        pT.position = new Vector3(rT.position.x + rT.anchorMax.x * rT.sizeDelta.x + popupMargin + pT.anchorMin.x * pT.sizeDelta.x, rT.position.y + rT.anchorMax.y * rT.sizeDelta.y, rT.position.z);
 
         //Load Items Features
         GoodsItem itemFeatures = itemReader.itemPool.items[itemButton.item.id];
@@ -185,12 +179,38 @@ public class PanelAnim : MonoBehaviour
         }
         weightPanel.GetComponent<TMP_Text>().text = "Weight: " + itemFeatures.weight.ToString();
         valuePanel.GetComponent<TMP_Text>().text = "Value: " + itemFeatures.basePrice.ToString();
+
+        //Align Window
+        RectTransform pT = popupWindow.GetComponent<RectTransform>();
+        alignWindow(pT, rT);
+    }
+
+    void alignWindow(RectTransform pT, RectTransform rT) {
+        float newX;
+        if(rT.position.x + rT.anchorMax.x * rT.sizeDelta.x + popupMargin + pT.sizeDelta.x < Screen.width) {
+            newX = rT.position.x + rT.anchorMax.x * rT.sizeDelta.x + popupMargin + pT.anchorMin.x * pT.sizeDelta.x;
+        } else {
+            newX = rT.position.x - rT.anchorMin.x * rT.sizeDelta.x - popupMargin - pT.anchorMax.x * pT.sizeDelta.x;
+        }
+        //waits until next frame so the panel can size refit first
+        StartCoroutine(WaitRT(pT, rT));
+        pT.position = new Vector3(newX, rT.position.y + rT.anchorMax.y * rT.sizeDelta.y, rT.position.z);
+    }
+
+    IEnumerator WaitRT(RectTransform pT, RectTransform rT) {
+        yield return 0;
+        float newY;
+        if(rT.position.y - rT.anchorMin.y * rT.sizeDelta.y - pT.anchorMin.y * pT.sizeDelta.y > 0) {
+            newY = rT.position.y + rT.anchorMax.y * rT.sizeDelta.y;
+        } else {
+            newY = pT.anchorMin.y * pT.sizeDelta.y;
+        }
+        pT.position = new Vector3(pT.position.x, newY, pT.position.z);
     }
     
     public void StowPopup(ItemButton itemButton) {
         if(itemButton == popupHovering) {
             popupWindow.SetActive(false);
-            Debug.Log("stowed");
         }
     }
 }
