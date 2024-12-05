@@ -10,11 +10,12 @@ public enum MenuType {
     NONE
 }
 
-public enum ItemActions {
-    DISCARD,
-    CONSUME,
-    SELL,
+public enum ItemAction {
     BUY,
+    SELL,
+    WITHDRAW,
     DEPOSIT,
-    WITHDRAW
+    CONSUME,
+    DISCARD,
+    
 }

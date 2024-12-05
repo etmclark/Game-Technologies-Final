@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,6 +18,9 @@ public class ItemButton : MonoBehaviour
     public delegate void ExitDel(ItemButton button);
     public HoverDel CallPopup;
     public ExitDel DismissPopup;
+    public HoverDel CallActions;
+    public ExitDel DismissActions;
+    [NonSerialized] public List<ItemAction> availableActions;
     private RectTransform myRectTransform;
     // Start is called before the first frame update
     void Awake() {
@@ -46,9 +50,14 @@ public class ItemButton : MonoBehaviour
     }
 
     public void Click() {
+        CallActions(this, myRectTransform);
+    }
+
+    public void DecrementAmount() {
         SetCount(count - 1);
         if(count == 0) {
             DismissPopup?.Invoke(this);
+            DismissActions?.Invoke(this);
             conMed.RemoveButton(butIndex);
         }
     }

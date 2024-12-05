@@ -6,7 +6,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 public class PlayerInteractionComponent : MonoBehaviour
 {
-    public Camera pCamera;
+    public Camera activeCamera;
     private IInteractable lookAtInteractable = null;
     private PanelAnim menuController;
     private InventoryComponent playerInventory;
@@ -24,7 +24,7 @@ public class PlayerInteractionComponent : MonoBehaviour
     IEnumerator LookAt() {
         for(;;) {
             IInteractable oldLookAt = lookAtInteractable;
-            if (Physics.Raycast(pCamera.transform.position, pCamera.transform.forward, out RaycastHit hit, lookRange)) {
+            if (Physics.Raycast(activeCamera.transform.position, activeCamera.transform.forward, out RaycastHit hit, lookRange)) {
                 lookAtInteractable = hit.transform.GetComponent<IInteractable>();
             } else {
                 lookAtInteractable = null;
@@ -54,6 +54,12 @@ public class PlayerInteractionComponent : MonoBehaviour
     public void Interact(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
             lookAtInteractable?.OnInteract(this);
+        }
+    }
+
+    public void Click(InputAction.CallbackContext ctx) {
+        if(ctx.performed) {
+            menuController.OnMouseClick();
         }
     }
 }

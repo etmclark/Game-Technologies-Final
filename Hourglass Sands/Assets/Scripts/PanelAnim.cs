@@ -1,9 +1,13 @@
 ///The code for using coroutine to manipulate the animation curve is a tutorial I found on the Internet: https://www.bilibili.com/video/BV11Y4y1a7hV/?spm_id_from=333.337.search-card.all.click&vd_source=5a7c3e147f0b6dc323e06605e69008fb
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 public class PanelAnim : MonoBehaviour
 {
@@ -19,18 +23,26 @@ public class PanelAnim : MonoBehaviour
     public GameObject lInventoryPanel;
     public GameObject lCachePanel;
     public GameObject popupWindow;
-    public ItemButton popupHovering;
+    private ItemButton popupHovering;
+    public GameObject actionsWindow;
+    private ItemButton actionsClicked;
+    private InventoryComponent playerInventory;
+    [NonSerialized] public InventoryComponent inventoryInteracting;
     private float popupMargin = 8;
     private bool animating = false;
     private GameObject openPanel = null;
     private MenuType openType = MenuType.NONE;
     private bool tooltipEnabled = true;
     private ItemPoolReader itemReader;
+    private bool popupSuppressed = false;
+    private bool popupHovered = false;
 
     void Start() {
         HideTooltip();
         itemReader = FindObjectOfType<ItemPoolReader>();
         popupWindow.SetActive(false);
+        actionsWindow.SetActive(false);
+        playerInventory = FindObjectOfType<PlayerInventory>();
     }
 
     IEnumerator ShowPanel(GameObject gameObject)
@@ -84,12 +96,34 @@ public class PanelAnim : MonoBehaviour
             ItemButton ib = button.GetComponent<ItemButton>();
             ib.CallPopup = DisplayPopup;
             ib.DismissPopup = StowPopup;
+            ib.CallActions = DisplayActions;
+            ib.DismissActions = StowActions;
+        }
+    }
+
+    public void RefreshInventory(InventoryComponent inventoryComp, GameObject inventoryPanel) {
+        ContentMediator cm = inventoryPanel.GetComponent<ContentMediator>();
+        int buttIndex = actionsClicked.butIndex;
+        cm.ClearButtons();
+        List<GameObject> buttons = cm.LoadFromInventory(inventoryComp);
+        AssignPopupDelegates(buttons);
+        if(actionsWindow.activeSelf) {
+            actionsClicked = buttons[buttIndex].GetComponent<ItemButton>();
+        }
+    }
+
+    public void CloseMatchingActions(GameObject inventoryPanel, int i) {
+        if(actionsClicked.transform.IsChildOf(inventoryPanel.transform) && actionsClicked.butIndex == i) {
+            StowActions(actionsClicked);
         }
     }
 
     public void OpenInventory(InventoryComponent pInventory) {
         if(!animating && openPanel == null) {
+            playerInventory = pInventory;
             pInventoryPanel.SetActive(true);
+            pInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(pInventory, pInventoryPanel);});
+            pInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(pInventoryPanel, i));
             List<GameObject> buttons = pInventoryPanel.GetComponent<ContentMediator>().LoadFromInventory(pInventory);
             AssignPopupDelegates(buttons);
             StartCoroutine(ShowPanel(pInventoryPanel));
@@ -103,6 +137,8 @@ public class PanelAnim : MonoBehaviour
 
     public void OpenMerchantMenu(InventoryComponent pInventory, InventoryComponent mInventory) {
         if(!animating && openPanel == null) {
+            playerInventory = pInventory;
+            inventoryInteracting = mInventory;
             merchantPanel.SetActive(true);
             StartCoroutine(ShowPanel(merchantPanel));
             Time.timeScale = 0; 
@@ -113,12 +149,28 @@ public class PanelAnim : MonoBehaviour
         }
     }
 
+    public void OpenCacheMenu(InventoryComponent pInventory, InventoryComponent cInventory) {
+        if(!animating && openPanel == null) {
+            playerInventory = pInventory;
+            inventoryInteracting = cInventory;
+            merchantPanel.SetActive(true);
+            StartCoroutine(ShowPanel(lootPanel));
+            Time.timeScale = 0; 
+            openPanel = merchantPanel;
+            openType = MenuType.LOOT_CRATE;
+        } else if (!animating && openType == MenuType.LOOT_CRATE) {
+            CloseMenu();
+        }
+    }
+
     public void OpenSettings() {
         //Unimplemented
     }
 
     void CloseMenu() {
         StartCoroutine(HidePanel(openPanel));
+        StowActions(actionsClicked);
+        StowPopup(popupHovering);
     }
 
     void FinishClose() {
@@ -128,13 +180,19 @@ public class PanelAnim : MonoBehaviour
         switch (openType) {
             case MenuType.MERCHANT:
                 Time.timeScale = 1;
+                playerInventory.e_InventoryUpdated.RemoveAllListeners();
+                playerInventory.e_ItemRemoved.RemoveAllListeners();
                 break;
             case MenuType.PLAYER_INVENTORY:
                 Time.timeScale = 1;
                 pInventoryPanel.GetComponent<ContentMediator>().ClearButtons();
                 openPanel.SetActive(false);
+                playerInventory.e_InventoryUpdated.RemoveAllListeners();
+                playerInventory.e_ItemRemoved.RemoveAllListeners();
                 break;
             case MenuType.LOOT_CRATE:
+                playerInventory.e_InventoryUpdated.RemoveAllListeners();
+                playerInventory.e_ItemRemoved.RemoveAllListeners();
                 Time.timeScale = 1;
                 break;
             case MenuType.SETTINGS:
@@ -158,7 +216,10 @@ public class PanelAnim : MonoBehaviour
     }
 
     public void DisplayPopup(ItemButton itemButton, RectTransform rT) {
-        popupWindow.SetActive(true);
+        if(!popupSuppressed) {
+            popupWindow.SetActive(true);
+        }
+        popupHovered = true;
         popupHovering = itemButton;
 
         //Load Items Features
@@ -171,7 +232,7 @@ public class PanelAnim : MonoBehaviour
         GameObject valuePanel = horizPanel.transform.Find("Value").gameObject;
         namePanel.GetComponent<TMP_Text>().text = itemFeatures.name;
         descPanel.GetComponent<TMP_Text>().text = itemFeatures.description;
-        if(itemFeatures.thirstRegen == 0) {
+        if(itemFeatures.thirstRegen != 0) {
             thirstPanel.SetActive(true);
             thirstPanel.GetComponent<TMP_Text> ().text = "Thirst: " + itemFeatures.thirstRegen.ToString();
         } else {
@@ -181,11 +242,121 @@ public class PanelAnim : MonoBehaviour
         valuePanel.GetComponent<TMP_Text>().text = "Value: " + itemFeatures.basePrice.ToString();
 
         //Align Window
-        RectTransform pT = popupWindow.GetComponent<RectTransform>();
-        alignWindow(pT, rT);
+        if(rT != null) {
+            RectTransform pT = popupWindow.GetComponent<RectTransform>();
+            AlignWindow(pT, rT);
+        }
     }
 
-    void alignWindow(RectTransform pT, RectTransform rT) {
+    public void DisplayPopup() {
+        if(!popupSuppressed) {
+            popupWindow.SetActive(true);
+        }
+    }
+
+    public void StowPopup(ItemButton itemButton) {
+        if(itemButton == popupHovering) {
+            popupHovered = false;
+            popupWindow.SetActive(false);
+        }
+    }
+
+    public void DisplayActions(ItemButton itemButton, RectTransform rT) {
+        popupSuppressed = true;
+        StowPopup(popupHovering);
+
+        actionsWindow.SetActive(true);
+        actionsClicked = itemButton;
+        GoodsItem itemFeatures = itemReader.itemPool.items[itemButton.item.id];
+
+        foreach(Transform child in actionsWindow.transform) {
+            child.gameObject.SetActive(false);
+        }
+        foreach(ItemAction IA in itemButton.availableActions) {
+            switch(IA) {
+                case ItemAction.BUY:
+                    actionsWindow.transform.Find("Buy").gameObject.SetActive(true);
+                    break;
+                case ItemAction.SELL:
+                    actionsWindow.transform.Find("Sell").gameObject.SetActive(true);
+                    break;
+                case ItemAction.WITHDRAW:
+                    actionsWindow.transform.Find("Withdraw").gameObject.SetActive(true);
+                    break;
+                case ItemAction.DEPOSIT:
+                    actionsWindow.transform.Find("Deposit").gameObject.SetActive(true);
+                    break;
+                case ItemAction.CONSUME:
+                    if(itemFeatures.thirstRegen != 0) {
+                        actionsWindow.transform.Find("Consume").gameObject.SetActive(true);
+                    }
+                    break;
+                case ItemAction.DISCARD:
+                    actionsWindow.transform.Find("Discard").gameObject.SetActive(true);
+                    break;
+            }
+        }
+
+        RectTransform aT = actionsWindow.GetComponent<RectTransform>();
+        AlignWindow(aT, rT);
+    }
+
+    public void StowActions(ItemButton itemButton) {
+        if(popupSuppressed) {
+            popupSuppressed = false;
+            if(popupHovered) {
+                DisplayPopup();
+            }
+        }
+        if(itemButton == actionsClicked) {
+            actionsWindow.SetActive(false);
+        }
+    }
+
+    public bool isOrIsChildOf(GameObject child, GameObject parent) {
+        return child == parent || child.transform.IsChildOf(parent.transform);
+    }
+
+    public bool mouseOnRect(GameObject rectHaver) {
+        RectTransform rectTransform = rectHaver.GetComponent<RectTransform>();
+        return RectTransformUtility.RectangleContainsScreenPoint(rectTransform, Mouse.current.position.ReadValue());
+    }
+
+    public bool mouseOnButtons(List<GameObject> buttons) {
+        foreach(GameObject button in buttons) {
+            if(mouseOnRect(button)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void OnMouseClick() {
+        if(actionsWindow.activeSelf) {
+            List<GameObject> buttonsToCheck;
+            switch(openType) {
+                case MenuType.PLAYER_INVENTORY:
+                    buttonsToCheck = pInventoryPanel.GetComponent<ContentMediator>().buttons;
+                    break;
+                case MenuType.MERCHANT:
+                    buttonsToCheck = mInventoryPanel.GetComponent<ContentMediator>().buttons;
+                    buttonsToCheck.AddRange(mShopPanel.GetComponent<ContentMediator>().buttons);
+                    break;
+                case MenuType.LOOT_CRATE:
+                    buttonsToCheck = lInventoryPanel.GetComponent<ContentMediator>().buttons;
+                    buttonsToCheck.AddRange(lCachePanel.GetComponent<ContentMediator>().buttons);
+                    break;
+                default:
+                    buttonsToCheck = new List<GameObject>();
+                    break;
+            }
+            if(!mouseOnRect(actionsWindow) && !mouseOnButtons(buttonsToCheck)) {
+                StowActions(actionsClicked);
+            }
+        }
+    }
+
+    void AlignWindow(RectTransform pT, RectTransform rT) {
         float newX;
         if(rT.position.x + rT.anchorMax.x * rT.sizeDelta.x + popupMargin + pT.sizeDelta.x < Screen.width) {
             newX = rT.position.x + rT.anchorMax.x * rT.sizeDelta.x + popupMargin + pT.anchorMin.x * pT.sizeDelta.x;
@@ -207,10 +378,52 @@ public class PanelAnim : MonoBehaviour
         }
         pT.position = new Vector3(pT.position.x, newY, pT.position.z);
     }
-    
-    public void StowPopup(ItemButton itemButton) {
-        if(itemButton == popupHovering) {
-            popupWindow.SetActive(false);
-        }
+
+    //Item Actions
+    public void Buy() {
+        Debug.Log("Buy");
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        int buttIndex = actionsClicked.butIndex;
+        playerInventory.itemInventory[buttIndex].amount -= 1;
+        actionsClicked.DecrementAmount();
+    }
+
+    public void Sell() {
+        Debug.Log("Sell");
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        int buttIndex = actionsClicked.butIndex;
+        playerInventory.itemInventory[buttIndex].amount -= 1;
+        actionsClicked.DecrementAmount();
+    }
+
+    public void Withdraw() {
+        Debug.Log("Withdraw");
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        int buttIndex = actionsClicked.butIndex;
+        inventoryInteracting.itemInventory[buttIndex].amount -= 1;
+        actionsClicked.DecrementAmount(); 
+    }
+
+    public void Deposit() {
+        Debug.Log("Deposit");
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        int buttIndex = actionsClicked.butIndex;
+        playerInventory.itemInventory[buttIndex].amount -= 1;
+        actionsClicked.DecrementAmount(); 
+    }
+    public void Consume() {
+        Debug.Log("Consume");
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        //Get thirst and add thirst regen of item;
+        playerInventory.RemoveItem(actionsClicked.item.id, 1);
+        //actionsClicked.DecrementAmount();
+    }
+    public void Discard() {
+        GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+        int buttIndex = actionsClicked.butIndex; 
+        Debug.Log("Discard");
+        playerInventory.RemoveItem(actionsClicked.item.id, 1);
+        // playerInventory.itemInventory[buttIndex].amount -= 1;
+        // actionsClicked.DecrementAmount();
     }
 }

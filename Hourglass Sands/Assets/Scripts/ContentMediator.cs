@@ -12,6 +12,7 @@ public class ContentMediator : MonoBehaviour
     public List<GameObject> contentList = new();
     public GameObject buttonPrefab;
     public List<GameObject> buttons = new();
+    public List<ItemAction> availableActions = new();
     private ItemPool itemPool;
     void Start()
     {
@@ -47,6 +48,7 @@ public class ContentMediator : MonoBehaviour
             int index = buttons.Count;
             buttScript.butIndex = index;
             buttScript.conMed = this;
+            buttScript.availableActions = this.availableActions;
             buttScript.LoadItem(itemPool.items[itemID], itemCount, usingInventory);
             buttons.Add(newButton);
             newButton.transform.SetParent(contentList[index].transform, false);
