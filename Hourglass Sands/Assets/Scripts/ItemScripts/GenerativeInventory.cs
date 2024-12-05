@@ -13,7 +13,7 @@ public class GenerativeInventory : InventoryComponent
 
     private float cBaseAppearance = 0.3f;
     private float cBaseCount = 4f;
-
+    private bool generated = false;
 
     private float weightCoeff = 1.5f;
     private ItemPoolReader itemPoolReader;
@@ -65,12 +65,16 @@ public class GenerativeInventory : InventoryComponent
             }
         }
         if(cInt != null) {
-            ClearInventory();
-            foreach (GoodsItem item in itemPoolReader.itemPool.items) {
-                if(Random.Range(0f, 1f) > cBaseAppearance) {
-                    int count = Mathf.FloorToInt(Random.Range(0f, cBaseCount / (item.weight * weightCoeff) + 1f));
-                    AddItem(item.id, count);
+            if(!generated) {
+                foreach (GoodsItem item in itemPoolReader.itemPool.items) {
+                    if(Random.Range(0f, 1f) > cBaseAppearance) {
+                        int count = Mathf.FloorToInt(Random.Range(0f, cBaseCount / (item.weight * weightCoeff) + 1f));
+                        AddItem(item.id, count);
+                    }
                 }
+                generated = true;
+            } else if (itemInventory.Count == 0) {
+                generated = false;
             }
         }
     }

@@ -151,6 +151,9 @@ public class PanelAnim : MonoBehaviour
     public void RefreshInventory(InventoryComponent inventoryComp, GameObject inventoryPanel) {
         ContentMediator cm = inventoryPanel.GetComponent<ContentMediator>();
         int buttIndex = actionsClicked.butIndex;
+        if(inventoryPanel == mShopPanel) {
+            Debug.Log("OW");
+        }
         cm.ClearButtons();
         Debug.Log(cm + "<3" + inventoryPanel.name);
         List<GameObject> buttons = cm.LoadFromInventory(inventoryComp);
