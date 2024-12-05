@@ -86,7 +86,7 @@ namespace StarterAssets
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
         private float _verticalVelocity;
-        private float _terminalVelocity = 53.0f;
+        //private float _terminalVelocity = 53.0f;
 
         // timeout deltatime
         private float _jumpTimeoutDelta;
@@ -287,48 +287,70 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            // Ensure the player only jumps if grounded and not if weight exceeds threshold
             if (Grounded)
             {
-                // Check if the player is attempting to jump
-                if (_verticalVelocity < 0.0f)
+                // reset the fall timeout timer
+                _fallTimeoutDelta = FallTimeout;
+
+                // update animator if using character
+                if (_hasAnimator)
                 {
-                    // If falling, set the vertical velocity to a small value to avoid continuous fall after landing
-                    _verticalVelocity = -2f; // small negative value to stick to the ground
+                    _animator.SetBool(_animIDJump, false);
+                    _animator.SetBool(_animIDFreeFall, false);
                 }
 
-                // If player is pressing jump and their weight is below the threshold, apply jump force
-                if (_input.jump && currentWeight < weightThreshold)
+                // stop our velocity dropping infinitely when grounded
+                if (_verticalVelocity < 0.0f)
                 {
+                    _verticalVelocity = -2f; // small downward velocity to stay grounded
+                }
+
+                // Check if jump button is pressed and we can jump (jumpTimeoutDelta <= 0.0f)
+                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                {
+                    // the square root of H * -2 * G = how much velocity needed to reach desired height
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+
+                    // update animator if using character
                     if (_hasAnimator)
                     {
                         _animator.SetBool(_animIDJump, true);
                     }
+                }
 
-                    // Reset the jump timeout timer after jumping
-                    _jumpTimeoutDelta = JumpTimeout;
+                // jump timeout - prevent multiple jumps in quick succession
+                if (_jumpTimeoutDelta >= 0.0f)
+                {
+                    _jumpTimeoutDelta -= Time.deltaTime;
                 }
             }
             else
             {
-                // If player is not grounded, keep applying gravity
+                // reset the jump timeout timer when in the air
+                _jumpTimeoutDelta = JumpTimeout;
+
+                // fall timeout
+                if (_fallTimeoutDelta >= 0.0f)
+                {
+                    _fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    // update animator if using character
+                    if (_hasAnimator)
+                    {
+                        _animator.SetBool(_animIDFreeFall, true);
+                    }
+                }
+
+                // if we are not grounded, do not allow jump input
+                _input.jump = false;  // Ensure the jump input is reset when in the air
+            }
+
+            // Apply gravity to the vertical velocity if not grounded
+            if (!_input.jump)  // prevent jump while in air
+            {
                 _verticalVelocity += Gravity * Time.deltaTime;
-            }
-
-            // Apply vertical velocity to movement
-            _controller.Move(new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
-            // Prevent further jumping until after the timeout
-            if (_jumpTimeoutDelta > 0.0f)
-            {
-                _jumpTimeoutDelta -= Time.deltaTime;
-            }
-
-            // Reset jump if not grounded and time exceeds timeout
-            if (_fallTimeoutDelta > 0.0f)
-            {
-                _fallTimeoutDelta -= Time.deltaTime;
             }
         }
 
