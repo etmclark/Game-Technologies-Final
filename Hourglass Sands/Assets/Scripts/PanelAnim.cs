@@ -164,7 +164,7 @@ public class PanelAnim : MonoBehaviour
     public void RefreshBuy() {
         if(buyPanel.activeSelf) {
             GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
-            if(modifyPrice(itemFeatures.basePrice) > playerInventory.currency) {
+            if(modifyPrice(itemFeatures.basePrice, itemFeatures.id) > playerInventory.currency) {
                 buyPanel.GetComponent<Button>().enabled = false;
             }
         }
@@ -338,7 +338,7 @@ public class PanelAnim : MonoBehaviour
             thirstPanel.SetActive(false);
         }
         weightPanel.GetComponent<TMP_Text>().text = "Weight: " + itemFeatures.weight.ToString("0.0");
-        valuePanel.GetComponent<TMP_Text>().text = "Value: " + modifyPrice(itemFeatures.basePrice).ToString("0.0");
+        valuePanel.GetComponent<TMP_Text>().text = "Value: " + modifyPrice(itemFeatures.basePrice, itemFeatures.id).ToString("0.0");
 
         //Align Window
         if(rT != null) {
@@ -488,7 +488,7 @@ public class PanelAnim : MonoBehaviour
         // playerInventory.itemInventory[buttIndex].amount -= 1;
         // actionsClicked.DecrementAmount();
         inventoryInteracting.RemoveItem(actionsClicked.item.id, 1);
-        playerInventory.PurchaseItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice));
+        playerInventory.PurchaseItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice, itemFeatures.id));
 
     }
 
@@ -499,7 +499,7 @@ public class PanelAnim : MonoBehaviour
         // playerInventory.itemInventory[buttIndex].amount -= 1;
         // actionsClicked.DecrementAmount();
         inventoryInteracting.AddItem(actionsClicked.item.id, 1);
-        playerInventory.SellItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice));
+        playerInventory.SellItem(actionsClicked.item.id, 1, modifyPrice(itemFeatures.basePrice, itemFeatures.id));
     }
 
     public void Withdraw() {
@@ -534,7 +534,7 @@ public class PanelAnim : MonoBehaviour
         // actionsClicked.DecrementAmount();
     }
 
-    public float modifyPrice(float basePrice) {
+    public float modifyPrice(float basePrice, int id) {
         Debug.Log("modified");
         Debug.Log(basePrice + "" + inventoryInteracting + "" + mI);
         if(inventoryInteracting != null) {
@@ -543,8 +543,7 @@ public class PanelAnim : MonoBehaviour
             }
             Debug.Log(basePrice + "" + mI);
             if(mI != null) {
-                Debug.Log(GenerativeInventory.TownToName(mI.location) + "" + actionsClicked.item.id);
-                float scarcity = scarcityGen.scarcityMap[GenerativeInventory.TownToName(mI.location)][actionsClicked.item.id];
+                float scarcity = scarcityGen.scarcityMap[mI.returnName()][id];
                 Debug.Log("scarcity: " + scarcity);
                 return basePrice * scarcity;
             }

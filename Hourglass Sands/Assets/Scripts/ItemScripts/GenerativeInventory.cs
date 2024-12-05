@@ -23,22 +23,6 @@ public class GenerativeInventory : InventoryComponent
         itemPoolReader = FindObjectOfType<ItemPoolReader>();
     }
 
-    public static string TownToName(Town townEnum) {
-        switch(townEnum) {
-            case Town.Oumnia:
-                return "Oumnia";
-            case Town.Lygash:
-                return "Lygash";
-            case Town.Kybeck:
-                return "Kybeck Laesh";
-            case Town.Vorbeck:
-                return "Vorbek Laesh";
-            case Town.Noor:
-                return "Noor Vaesh";
-        }
-        return "";
-    }
-
     public void ClearInventory() {
         foreach (var item in itemInventory) {
             RemoveItem(item.id, item.amount);
@@ -60,8 +44,8 @@ public class GenerativeInventory : InventoryComponent
         if(mInt != null) {
             Debug.Log("Trade");
             ClearInventory();
-            if(scarcityMap.ContainsKey(TownToName(mInt.location))) {
-                Dictionary<int, float> innerDict = scarcityMap.GetValueOrDefault(TownToName(mInt.location));
+            if(scarcityMap.ContainsKey(mInt.returnName())) {
+                Dictionary<int, float> innerDict = scarcityMap.GetValueOrDefault(mInt.returnName());
                 foreach (GoodsItem item in itemPoolReader.itemPool.items) {
                     float scarcity = innerDict[item.id];
                     if(Random.Range(0f, 1f) > mBaseAppearance * scarcity) {

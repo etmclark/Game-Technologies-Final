@@ -13,6 +13,26 @@ public class MerchantInteractable : MonoBehaviour, IInteractable
         get { return toolTip + firstName; }
     }
 
+    public static string TownToName(Town townEnum) {
+        switch(townEnum) {
+            case Town.Oumnia:
+                return "Oumnia";
+            case Town.Lygash:
+                return "Lygash";
+            case Town.Kybeck:
+                return "Kybeck Laesh";
+            case Town.Vorbeck:
+                return "Vorbek Laesh";
+            case Town.Noor:
+                return "Noor Vaesh";
+        }
+        return "";
+    }
+
+    public string returnName() {
+        return TownToName(location);
+    }
+
     public void OnInteract(PlayerInteractionComponent interactionComponent)
     {
         menuControls.OpenMerchantMenu(interactionComponent.GetComponent<PlayerInventory>(), mInventory);
