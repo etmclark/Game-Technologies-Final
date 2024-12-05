@@ -1,5 +1,5 @@
 ///The code for using coroutine to manipulate the animation curve is a tutorial I found on the Internet: https://www.bilibili.com/video/BV11Y4y1a7hV/?spm_id_from=333.337.search-card.all.click&vd_source=5a7c3e147f0b6dc323e06605e69008fb
-
+//used for the basic Pop-up animation
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,10 +12,10 @@ using UnityEngine.UI;
 
 public class PanelAnim : MonoBehaviour
 {
-    public AnimationCurve showCurve;
+    public AnimationCurve showCurve;//easing effect for showing and hiding the panel
     public AnimationCurve hideCurve;
-    public float animationSpeed;
-    public GameObject toolTipObject;
+    public float animationSpeed;//  Speed for the animations
+    public GameObject toolTipObject;//panels
     public GameObject pInventoryPanel;
     public GameObject merchantPanel;
     public GameObject mInventoryPanel;
@@ -61,30 +61,35 @@ public class PanelAnim : MonoBehaviour
 
     IEnumerator ShowPanel(GameObject gameObject)
     {
-        float timer = 0;
-        animating = true;
-        if(tooltipEnabled) {
+        float timer = 0; // set the timer
+        animating = true;//flag that animation is in progress
+        if (tooltipEnabled) {
             HideTooltip(false);
         }
+        // Gradually scale the panel until the animation finishs.
         while (timer <= 1) {
+            // Adjust the panel's scale with the showcurve
             gameObject.transform.localScale = Vector3.one * showCurve.Evaluate(timer);
             timer += Time.unscaledDeltaTime * animationSpeed;
             yield return null;
         }
         animating = false;
+        // Mark the animation done.
     }
 
     IEnumerator HidePanel(GameObject gameObject)
     {
-        float timer = 0;
-        animating = true;
+        float timer = 0;// set the timer
+        animating = true;//flag the anim is working 
         while (timer <= 1) {
+            //sclae with the curve
             gameObject.transform.localScale = Vector3.one * hideCurve.Evaluate(timer);
             timer += Time.unscaledDeltaTime * animationSpeed;
             yield return null;
         }
         FinishClose();
         animating = false;
+        // Mark the animation done.
     }
 
     public void SetTooltip(string tooltip) {

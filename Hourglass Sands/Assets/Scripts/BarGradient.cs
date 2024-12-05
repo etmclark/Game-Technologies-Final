@@ -7,33 +7,34 @@ using UnityEngine.SceneManagement;
 
 public class BarGradient : MonoBehaviour
 {
-    public Slider Slider1;
-    public Image fillImage;
-    public AudioSource audioSourceLow;
-    public AudioSource audioSourceMedium;
+    public Slider Slider1;//  slider UI component
+    public Image fillImage;// color-changing fill image of the slider
+    public AudioSource audioSourceLow;//heartbeat sound 
+    public AudioSource audioSourceMedium;//breath
+    //colors
     public Color safe = Color.green;
     public Color meh = Color.yellow;
     public Color danger = Color.gray;
-    public static float healthValue;
+    public static float healthValue; //health
 
     void Start()
     {
         healthValue = Slider1.maxValue;
-        Slider1.value = healthValue;
-        UpdateFillColor(Slider1.value);
+        Slider1.value = healthValue; //sync the value 
+        UpdateFillColor(Slider1.value);//tract the hp and changing color
     }
 
     void Update()
     {
-        Slider1.value -= Time.deltaTime;
+        Slider1.value -= Time.deltaTime; //health goes down by sec
         if (Slider1.value < 0)
         {
-            Slider1.value = 0;
+            Slider1.value = 0; //lock the min health to 0
         }
         healthValue = Slider1.value;
         UpdateFillColor(Slider1.value);
         UpdateAudio(Slider1.value / Slider1.maxValue);
-        if (healthValue == 0)
+        if (healthValue == 0)//losing state& stop SEF& unlock mouse
         {
             audioSourceLow.Stop(); 
             audioSourceMedium.Stop();
@@ -45,10 +46,10 @@ public class BarGradient : MonoBehaviour
 
     void UpdateFillColor(float value)
     {
-        if (fillImage != null)
+        if (fillImage != null)// Check if the fill image is not null
         {
             float percentage = value / Slider1.maxValue;
-
+            // Update the fill color based on key values
             if (percentage > 0.65f)
             {
                 fillImage.color = safe;
@@ -66,15 +67,15 @@ public class BarGradient : MonoBehaviour
 
     void UpdateAudio(float percentage)
     {
-        if (audioSourceLow != null && audioSourceMedium != null)
+        if (audioSourceLow != null && audioSourceMedium != null)// Check sound source are there
         {
-            if (percentage > 0.2f && percentage <= 0.65f)
+            if (percentage > 0.2f && percentage <= 0.65f) //medium health audio 
             {
                 float adjustedPercentage = (percentage - 0.2f) / 0.45f; 
-                audioSourceMedium.volume = Mathf.Lerp(0.5f, 0.1f, adjustedPercentage); 
-                audioSourceMedium.pitch = Mathf.Lerp(1.5f, 1f, adjustedPercentage); 
+                audioSourceMedium.volume = Mathf.Lerp(0.5f, 0.1f, adjustedPercentage); //Volume decreases as health decreases
+                audioSourceMedium.pitch = Mathf.Lerp(1.5f, 1f, adjustedPercentage);// Pitch decreases as health decreases
 
-                if (!audioSourceMedium.isPlaying)
+                if (!audioSourceMedium.isPlaying)// Start playing medium health audio if it's not already playing
                 {
                     audioSourceMedium.Play();
                 }
@@ -85,18 +86,18 @@ public class BarGradient : MonoBehaviour
                 audioSourceMedium.Stop();
             }
 
-            if (percentage > 0f && percentage <= 0.2f)
+            if (percentage > 0f && percentage <= 0.2f) //low health audio
             {
                 float adjustedPercentage = percentage / 0.2f; 
-                audioSourceLow.volume = Mathf.Lerp(0.1f, 0.5f, 1 - adjustedPercentage); 
-                if (!audioSourceLow.isPlaying)
+                audioSourceLow.volume = Mathf.Lerp(0.1f, 0.5f, 1 - adjustedPercentage); //Volume increases as health decreases
+                if (!audioSourceLow.isPlaying)// Start playing low health audio if it's not already playing
                 {
                     audioSourceLow.Play();
                 }
             }
             else
             {
-                audioSourceLow.volume = 0f;
+                audioSourceLow.volume = 0f;// Stop low health audio if health is outside the range
                 audioSourceLow.Stop();
             }
         }
