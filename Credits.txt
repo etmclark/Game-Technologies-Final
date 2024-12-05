@@ -36,5 +36,4 @@ freesound_community-CERCEAU_Morgane_2018_2019_electrocardiogram
 
 Unity Technologies-Starter Assets - ThirdPerson
 
-Please press the Escape button to go to Main menu.
 
