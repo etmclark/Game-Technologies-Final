@@ -8,6 +8,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PanelAnim : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class PanelAnim : MonoBehaviour
     private ItemButton popupHovering;
     public GameObject actionsWindow;
     private ItemButton actionsClicked;
-    private InventoryComponent playerInventory;
+    private PlayerInventory playerInventory;
     [NonSerialized] public InventoryComponent inventoryInteracting;
     private float popupMargin = 8;
     private bool animating = false;
@@ -36,6 +37,13 @@ public class PanelAnim : MonoBehaviour
     private ItemPoolReader itemReader;
     private bool popupSuppressed = false;
     private bool popupHovered = false;
+    private GameObject buyPanel;
+    private GameObject sellPanel;
+    private GameObject withdrawPanel;
+    private GameObject depositPanel;
+    private GameObject consumePanel;
+    private GameObject discardPanel;
+
 
     void Start() {
         HideTooltip();
@@ -43,6 +51,12 @@ public class PanelAnim : MonoBehaviour
         popupWindow.SetActive(false);
         actionsWindow.SetActive(false);
         playerInventory = FindObjectOfType<PlayerInventory>();
+        buyPanel = actionsWindow.transform.Find("Buy").gameObject;
+        sellPanel = actionsWindow.transform.Find("Sell").gameObject;
+        withdrawPanel = actionsWindow.transform.Find("Withdraw").gameObject;
+        depositPanel = actionsWindow.transform.Find("Deposit").gameObject;
+        consumePanel = actionsWindow.transform.Find("Consume").gameObject;
+        discardPanel = actionsWindow.transform.Find("Discard").gameObject;
     }
 
     IEnumerator ShowPanel(GameObject gameObject)
@@ -118,7 +132,16 @@ public class PanelAnim : MonoBehaviour
         }
     }
 
-    public void OpenInventory(InventoryComponent pInventory) {
+    public void RefreshBuy() {
+        if(buyPanel.activeSelf) {
+            GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
+            if(itemFeatures.basePrice < playerInventory.currency) {
+                buyPanel.GetComponent<Button>().enabled = false;
+            }
+        }
+    }
+
+    public void OpenInventory(PlayerInventory pInventory) {
         if(!animating && openPanel == null) {
             playerInventory = pInventory;
             pInventoryPanel.SetActive(true);
@@ -135,7 +158,7 @@ public class PanelAnim : MonoBehaviour
         }
     }
 
-    public void OpenMerchantMenu(InventoryComponent pInventory, InventoryComponent mInventory) {
+    public void OpenMerchantMenu(PlayerInventory pInventory, InventoryComponent mInventory) {
         if(!animating && openPanel == null) {
             playerInventory = pInventory;
             inventoryInteracting = mInventory;
@@ -149,7 +172,7 @@ public class PanelAnim : MonoBehaviour
         }
     }
 
-    public void OpenCacheMenu(InventoryComponent pInventory, InventoryComponent cInventory) {
+    public void OpenCacheMenu(PlayerInventory pInventory, InventoryComponent cInventory) {
         if(!animating && openPanel == null) {
             playerInventory = pInventory;
             inventoryInteracting = cInventory;
@@ -275,24 +298,25 @@ public class PanelAnim : MonoBehaviour
         foreach(ItemAction IA in itemButton.availableActions) {
             switch(IA) {
                 case ItemAction.BUY:
-                    actionsWindow.transform.Find("Buy").gameObject.SetActive(true);
+                    buyPanel.SetActive(true);
+                    playerInventory.e_CurrencyUpdated.AddListener(RefreshBuy);
                     break;
                 case ItemAction.SELL:
-                    actionsWindow.transform.Find("Sell").gameObject.SetActive(true);
+                    sellPanel.SetActive(true);
                     break;
                 case ItemAction.WITHDRAW:
-                    actionsWindow.transform.Find("Withdraw").gameObject.SetActive(true);
+                    withdrawPanel.SetActive(true);
                     break;
                 case ItemAction.DEPOSIT:
-                    actionsWindow.transform.Find("Deposit").gameObject.SetActive(true);
+                    depositPanel.SetActive(true);
                     break;
                 case ItemAction.CONSUME:
                     if(itemFeatures.thirstRegen != 0) {
-                        actionsWindow.transform.Find("Consume").gameObject.SetActive(true);
+                        consumePanel.SetActive(true);
                     }
                     break;
                 case ItemAction.DISCARD:
-                    actionsWindow.transform.Find("Discard").gameObject.SetActive(true);
+                    discardPanel.SetActive(true);
                     break;
             }
         }
@@ -302,13 +326,14 @@ public class PanelAnim : MonoBehaviour
     }
 
     public void StowActions(ItemButton itemButton) {
-        if(popupSuppressed) {
+        if(itemButton == actionsClicked) {
+            playerInventory.e_CurrencyUpdated.RemoveListener(RefreshBuy);
+            if(popupSuppressed) {
             popupSuppressed = false;
             if(popupHovered) {
                 DisplayPopup();
             }
-        }
-        if(itemButton == actionsClicked) {
+            }
             actionsWindow.SetActive(false);
         }
     }
