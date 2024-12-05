@@ -1,0 +1,5 @@
+The words in menu and dead scenes use the BadScript font, which can be found here:
+https://fonts.google.com/specimen/Bad+Script/license?preview.text=desert&lang=en_Latn&categoryFilters=Calligraphy:%2FScript%2FHandwritten
+
+License:
+https://fonts.google.com/specimen/Bad+Script/license?preview.text=desert&lang=en_Latn&categoryFilters=Calligraphy:%2FScript%2FHandwritten
