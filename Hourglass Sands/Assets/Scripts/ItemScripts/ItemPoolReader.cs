@@ -10,7 +10,7 @@ public class ItemPoolReader : MonoBehaviour
     public TextAsset itemsFile;
     [NonSerialized] public ItemPool itemPool;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         Assert.IsNotNull(itemsFile);
         itemPool = JsonUtility.FromJson<ItemPool>(itemsFile.text);
