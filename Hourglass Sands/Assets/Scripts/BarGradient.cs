@@ -38,6 +38,8 @@ public class BarGradient : MonoBehaviour
             audioSourceLow.Stop(); 
             audioSourceMedium.Stop();
             SceneManager.LoadScene("DeadScene");
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
