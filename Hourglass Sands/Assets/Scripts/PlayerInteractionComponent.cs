@@ -25,7 +25,6 @@ public class PlayerInteractionComponent : MonoBehaviour
         for(;;) {
             IInteractable oldLookAt = lookAtInteractable;
             if (Physics.Raycast(pCamera.transform.position, pCamera.transform.forward, out RaycastHit hit, lookRange)) {
-                Debug.Log("hit!");
                 lookAtInteractable = hit.transform.GetComponent<IInteractable>();
             } else {
                 lookAtInteractable = null;

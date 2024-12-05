@@ -6,6 +6,7 @@ public class MerchantInteractable : MonoBehaviour, IInteractable
 {
     public InventoryComponent mInventory;
     public string firstName = "Merchant";
+    public string location;
     private PanelAnim menuControls;
     readonly private string toolTip = "[E] Trade with ";
     public string ToolTip {
