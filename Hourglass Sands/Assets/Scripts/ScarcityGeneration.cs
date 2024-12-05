@@ -10,6 +10,7 @@ public class ScarcityGeneration : MonoBehaviour
     ItemPoolReader itemPoolReader;
     public TextAsset POIFile;
     private SettlementList locationData;
+    private GenerativeInventory[] generators;
 
     private float scarcityMaxDeviance = 0.3f;
     void Start()
@@ -17,14 +18,9 @@ public class ScarcityGeneration : MonoBehaviour
         itemPoolReader = FindObjectOfType<ItemPoolReader>();
         Assert.IsNotNull(POIFile);
         locationData = JsonUtility.FromJson<SettlementList>(POIFile.text);
-
-        if(itemPoolReader.itemPool != null) {
-            Debug.Log("not null");
-            GenerateScarcity();
-        } else {
-            Debug.Log("null");
-            StartCoroutine(WaitForItemPool());
-        }
+        Debug.Log("null");
+        generators = FindObjectsOfType<GenerativeInventory>(); 
+        StartCoroutine(WaitForItemPool());
     }
 
     void GenerateScarcity() {
@@ -47,19 +43,19 @@ public class ScarcityGeneration : MonoBehaviour
 
     void generateBoard() {
         Debug.Log("generating");
-        GenerativeInventory[] generators = FindObjectsOfType<GenerativeInventory>(); 
-        foreach (GenerativeInventory generative in generators) {
-            Debug.Log(generative);
-            generative.Regenerate(scarcityMap);
+        for (int i = 0; i < generators.Length; i++) {
+            GenerativeInventory generator = generators[i];
+            Debug.Log(generator);
+            generator.Regenerate(scarcityMap);
         }
     }
 
     IEnumerator WaitForItemPool() {
         for(;;) {
+            yield return new WaitForSeconds(.1f);
             if(itemPoolReader.itemPool != null) {
                 break;
             }
-            yield return new WaitForSeconds(.1f);
         }
         GenerateScarcity();
     }

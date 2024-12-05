@@ -24,7 +24,8 @@ public class GenerativeInventory : InventoryComponent
     }
 
     public void ClearInventory() {
-        foreach (var item in itemInventory) {
+        List<InventoryItem> itemsToRemove = new List<InventoryItem>(itemInventory);
+        foreach (InventoryItem item in itemsToRemove) {
             RemoveItem(item.id, item.amount);
         }
     }

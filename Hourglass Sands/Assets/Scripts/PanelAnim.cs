@@ -233,10 +233,10 @@ public class PanelAnim : MonoBehaviour
             setWeightAndMoney(lInventoryPanel);
             updateWeight();
             updateMoney();
-            merchantPanel.SetActive(true);
-            mInventoryPanel.SetActive(true);
+            lootPanel.SetActive(true);
+            lInventoryPanel.SetActive(true);
             //player side
-            pInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(pInventory, mInventoryPanel);});
+            pInventory.e_InventoryUpdated.AddListener(() => {RefreshInventory(pInventory, lInventoryPanel);});
             pInventory.e_InventoryUpdated.AddListener(updateWeight);
             pInventory.e_CurrencyUpdated.AddListener(updateMoney);
             pInventory.e_ItemRemoved.AddListener((int i) => CloseMatchingActions(lInventoryPanel, i));
@@ -542,9 +542,7 @@ public class PanelAnim : MonoBehaviour
 
     public float modifyPrice(float basePrice, int id) {
         if(inventoryInteracting != null) {
-            if(mI == null) {
-                mI = inventoryInteracting.GetComponent<MerchantInteractable>();
-            }
+            mI = inventoryInteracting.GetComponent<MerchantInteractable>();
             if(mI != null) {
                 float scarcity = scarcityGen.scarcityMap[mI.returnName()][id];
                 return basePrice * scarcity;
