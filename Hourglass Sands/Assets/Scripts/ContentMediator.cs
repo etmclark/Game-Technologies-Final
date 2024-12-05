@@ -12,6 +12,7 @@ public class ContentMediator : MonoBehaviour
     public List<GameObject> contentList = new();
     public GameObject buttonPrefab;
     public List<GameObject> buttons = new();
+    public List<ItemAction> availableActions = new();
     private ItemPool itemPool;
     void Start()
     {
@@ -22,19 +23,21 @@ public class ContentMediator : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void LoadFromInventory(InventoryComponent inventory) {
+    public List<GameObject> LoadFromInventory(InventoryComponent inventory) {
         foreach (InventoryItem item in inventory.itemInventory) {
-            AddButton(item.id, item.amount);
+            AddButton(item.id, item.amount, inventory);
         }
+        return buttons;
     }
 
     void RefreshButtonParents() {
         for (int i = 0; i < buttons.Count; i++) {
+            buttons[i].GetComponent<ItemButton>().butIndex = i;
             buttons[i].transform.SetParent(contentList[i].transform, false);
         }
     }
 
-    void AddButton(int itemID, int itemCount) {
+    void AddButton(int itemID, int itemCount, InventoryComponent usingInventory) {
         if (itemCount > 0) {
             if (itemID > contentList.Count) {
                 this.AddRow();
@@ -45,20 +48,15 @@ public class ContentMediator : MonoBehaviour
             int index = buttons.Count;
             buttScript.butIndex = index;
             buttScript.conMed = this;
-            buttScript.LoadItem(itemPool.items[itemID], itemCount);
+            buttScript.availableActions = this.availableActions;
+            buttScript.LoadItem(itemPool.items[itemID], itemCount, usingInventory);
             buttons.Add(newButton);
             newButton.transform.SetParent(contentList[index].transform, false);
         }
     }
 
-    void InsertButton(int buttonIndex, int itemID, int itemCount) {
-        GameObject newButton = Instantiate(buttonPrefab);
-        newButton.GetComponent<ItemButton>().LoadItem(itemPool.items[itemID], itemCount);
-        buttons.Insert(buttonIndex, newButton);
-        RefreshButtonParents();
-    }
-
-    void RemoveButton(int buttonIndex) {
+    public void RemoveButton(int buttonIndex) {
+        Destroy(buttons[buttonIndex]);
         buttons.RemoveAt(buttonIndex);
         RefreshButtonParents();
     }
@@ -71,7 +69,6 @@ public class ContentMediator : MonoBehaviour
     }
 
     void AddRow() {
-        Debug.Log("Row");
         if (contentPanel != null) {
             for(int i = 0; i < rowSize; i++) {
                 GameObject newChild = Instantiate(contentContainerPrefab);

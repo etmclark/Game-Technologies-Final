@@ -3,37 +3,43 @@
         {
             "id": 0,
             "name": "Apple",
-            "description": "Apple",
+            "description": "A sweet fruit that does not grow naturally in the desert",
             "iconFile": "12",
-            "basePrice": 2.0
+            "basePrice": 2.0,
+            "thirstRegen": 1.0,
+            "weight": 0.33
         },
         {
             "id": 1,
             "name": "Pear",
             "description": "Apple",
             "iconFile": "9",
-            "basePrice": 3.5
+            "basePrice": 3.5,
+            "weight": 0.5
         },
         {
             "id": 2,
             "name": "Starfruit",
             "description": "Apple",
             "iconFile": "21",
-            "basePrice": 20.0
+            "basePrice": 20.0,
+            "weight": 0.25
         },
         {
             "id": 3,
             "name": "Fig",
-            "description": "Apple",
+            "description": "Fig",
             "iconFile": "1",
-            "basePrice": 1.0
+            "basePrice": 1.0,
+            "weight": 0.1
         },
         {
             "id": 4,
             "name": "Avocado",
             "description": "Apple",
-            "iconFile": "1",
-            "basePrice": 6.0
+            "iconFile": "2",
+            "basePrice": 6.0,
+            "weight": 0.625
         }
     ]
 }

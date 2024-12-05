@@ -9,3 +9,13 @@ public enum MenuType {
     SETTINGS, 
     NONE
 }
+
+public enum ItemAction {
+    BUY,
+    SELL,
+    WITHDRAW,
+    DEPOSIT,
+    CONSUME,
+    DISCARD,
+    
+}
