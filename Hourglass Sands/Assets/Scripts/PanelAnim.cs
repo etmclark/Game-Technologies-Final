@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using StarterAssets;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -49,6 +50,7 @@ public class PanelAnim : MonoBehaviour
     private ScarcityGeneration scarcityGen = null;
     private MerchantInteractable mI;
     private BarGradient thirstBar;
+    private ThirdPersonController TPControl;
     void Start() {
         HideTooltip();
         itemReader = FindObjectOfType<ItemPoolReader>();
@@ -63,6 +65,7 @@ public class PanelAnim : MonoBehaviour
         discardPanel = actionsWindow.transform.Find("Discard").gameObject;
         scarcityGen = FindObjectOfType<ScarcityGeneration>();
         thirstBar = FindObjectOfType<BarGradient>();
+        TPControl = FindObjectOfType<ThirdPersonController>();
     }
 
     IEnumerator ShowPanel(GameObject gameObject)
@@ -134,7 +137,8 @@ public class PanelAnim : MonoBehaviour
     public void updateWeight() {
         if(weightPanel != null) {
             float weight = itemReader.itemPool.ComputeWeight(playerInventory.itemInventory.ToArray());
-            weightPanel.GetComponent<TMP_Text>().text = "Weight: " + weight.ToString("0.00") + "/" + "50";
+            weightPanel.GetComponent<TMP_Text>().text = "Weight: " + weight.ToString("0.00") + "/" + TPControl.MaxCarryWeight;
+            TPControl.UpdateCarryWeight(weight);
         }
     }
 
@@ -148,6 +152,7 @@ public class PanelAnim : MonoBehaviour
         ContentMediator cm = inventoryPanel.GetComponent<ContentMediator>();
         int buttIndex = actionsClicked.butIndex;
         cm.ClearButtons();
+        Debug.Log(cm + "<3" + inventoryPanel.name);
         List<GameObject> buttons = cm.LoadFromInventory(inventoryComp);
         AssignPopupDelegates(buttons);
         if(actionsWindow.activeSelf && actionsClicked.transform.IsChildOf(inventoryPanel.transform)) {
@@ -433,6 +438,7 @@ public class PanelAnim : MonoBehaviour
     }
 
     public void OnMouseClick() {
+        Debug.Log("Click" + actionsClicked);
         if(actionsWindow.activeSelf) {
             List<GameObject> buttonsToCheck;
             switch(openType) {
@@ -521,7 +527,7 @@ public class PanelAnim : MonoBehaviour
         Debug.Log("Consume");
         GoodsItem itemFeatures = itemReader.itemPool.items[actionsClicked.item.id];
         //Get thirst and add thirst regen of item;
-        thirstBar.refill(itemFeatures.thirstRegen);
+        thirstBar?.refill(itemFeatures.thirstRegen);
         playerInventory.RemoveItem(actionsClicked.item.id, 1);
         //actionsClicked.DecrementAmount();
     }
@@ -535,16 +541,12 @@ public class PanelAnim : MonoBehaviour
     }
 
     public float modifyPrice(float basePrice, int id) {
-        Debug.Log("modified");
-        Debug.Log(basePrice + "" + inventoryInteracting + "" + mI);
         if(inventoryInteracting != null) {
             if(mI == null) {
                 mI = inventoryInteracting.GetComponent<MerchantInteractable>();
             }
-            Debug.Log(basePrice + "" + mI);
             if(mI != null) {
                 float scarcity = scarcityGen.scarcityMap[mI.returnName()][id];
-                Debug.Log("scarcity: " + scarcity);
                 return basePrice * scarcity;
             }
         }
