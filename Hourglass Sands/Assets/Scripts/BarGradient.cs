@@ -37,7 +37,7 @@ public class BarGradient : MonoBehaviour
         {
             audioSourceLow.Stop(); 
             audioSourceMedium.Stop();
-            SceneManager.LoadScene(2);
+            SceneManager.LoadScene("DeadScene");
         }
     }
 
