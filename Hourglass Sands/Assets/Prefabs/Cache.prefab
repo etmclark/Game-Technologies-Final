@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 3317988}
   - component: {fileID: 2326118}
   - component: {fileID: 6427650}
+  - component: {fileID: 816216416483735945}
+  - component: {fileID: 6581555795858031595}
   m_Layer: 0
   m_Name: Cache
   m_TagString: Untagged
@@ -106,3 +108,35 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 0e5ed2a9885274a43b78a1467867b3da, type: 3}
+--- !u!114 &816216416483735945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b0d616d1321ff7408e63ca1de171b75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cInventory: {fileID: 0}
+--- !u!114 &6581555795858031595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110950}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85b803d6276613942be2c06289379508, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  e_InventoryUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  e_ItemRemoved:
+    m_PersistentCalls:
+      m_Calls: []
+  itemInventory: []
