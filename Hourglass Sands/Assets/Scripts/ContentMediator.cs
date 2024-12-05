@@ -30,6 +30,7 @@ public class ContentMediator : MonoBehaviour
 
     void RefreshButtonParents() {
         for (int i = 0; i < buttons.Count; i++) {
+            buttons[i].GetComponent<ItemButton>().butIndex = i;
             buttons[i].transform.SetParent(contentList[i].transform, false);
         }
     }
@@ -58,7 +59,8 @@ public class ContentMediator : MonoBehaviour
         RefreshButtonParents();
     }
 
-    void RemoveButton(int buttonIndex) {
+    public void RemoveButton(int buttonIndex) {
+        Destroy(buttons[buttonIndex]);
         buttons.RemoveAt(buttonIndex);
         RefreshButtonParents();
     }

@@ -9,4 +9,5 @@ public class GoodsItem {
     public string description;
     public string iconFile;
     public float basePrice;
+    public float thirstRegen = -1f;
 }

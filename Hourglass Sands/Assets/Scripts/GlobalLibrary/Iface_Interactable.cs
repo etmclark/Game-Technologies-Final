@@ -3,5 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface IInteractable {
-    void OnInteract();
+    string ToolTip { get; }
+    void OnInteract(PlayerInteractionComponent interactionComponent);
 }

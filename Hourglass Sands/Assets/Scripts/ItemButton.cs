@@ -1,25 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemButton : MonoBehaviour
 {
-    public GameObject imageObject;
     public ContentMediator conMed;
     private GoodsItem item = null;
     private int count = 0;
     public int butIndex = 0;
     private RawImage imageComponent;
+    private TMP_Text textComponent;
     // Start is called before the first frame update
     void Awake()
     {
-        imageComponent = imageObject.GetComponent<RawImage>();
+        imageComponent = gameObject.GetComponentInChildren<RawImage>();
+        textComponent = gameObject.GetComponentInChildren<TMP_Text>();
     }
 
     public void LoadItem(GoodsItem item, int itemCount) {
         this.item = item;
-        count = itemCount;
+        SetCount(itemCount);
         SetTexture(item.iconFile);
     }
 
@@ -28,7 +30,15 @@ public class ItemButton : MonoBehaviour
         imageComponent.texture = tex;
     }
 
-    public void SetCount() {
+    public void SetCount(int itemCount) {
+        count = itemCount;
+        textComponent.text = itemCount.ToString();
+    }
 
+    public void Click() {
+        SetCount(count - 1);
+        if(count == 0) {
+            conMed.RemoveButton(butIndex);
+        }
     }
 }

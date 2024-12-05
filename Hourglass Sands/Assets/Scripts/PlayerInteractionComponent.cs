@@ -23,10 +23,18 @@ public class PlayerInteractionComponent : MonoBehaviour
     // Update is called once per frame
     IEnumerator LookAt() {
         for(;;) {
+            IInteractable oldLookAt = lookAtInteractable;
             if (Physics.Raycast(pCamera.transform.position, pCamera.transform.forward, out RaycastHit hit, lookRange)) {
+                Debug.Log("hit!");
                 lookAtInteractable = hit.transform.GetComponent<IInteractable>();
             } else {
                 lookAtInteractable = null;
+            }
+            if(lookAtInteractable != null && oldLookAt == null) {
+                menuController.ShowTooltip();
+                menuController.SetTooltip(lookAtInteractable.ToolTip);
+            } else if(lookAtInteractable == null && oldLookAt != null) {
+                menuController.HideTooltip();
             }
             yield return new WaitForSeconds(lookAtTimer);
         }
@@ -34,15 +42,19 @@ public class PlayerInteractionComponent : MonoBehaviour
 
     public void OpenInventory(InputAction.CallbackContext ctx) {
         if(ctx.performed) {
-            menuController.openInventory(playerInventory);
+            menuController.OpenInventory(playerInventory);
         }
     }
 
     public void StartMenu(InputAction.CallbackContext ctx) {
-        menuController.startMenu();
+        if(ctx.performed) {
+            menuController.StartMenu();
+        }
     }
 
     public void Interact(InputAction.CallbackContext ctx) {
-        lookAtInteractable?.OnInteract();
+        if(ctx.performed) {
+            lookAtInteractable?.OnInteract(this);
+        }
     }
 }
