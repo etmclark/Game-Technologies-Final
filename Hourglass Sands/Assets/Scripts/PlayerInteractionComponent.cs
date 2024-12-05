@@ -9,13 +9,13 @@ public class PlayerInteractionComponent : MonoBehaviour
     public Camera activeCamera;
     private IInteractable lookAtInteractable = null;
     private PanelAnim menuController;
-    private InventoryComponent playerInventory;
+    private PlayerInventory playerInventory;
     [SerializeField] private float lookRange = 18f;
     private float lookAtTimer = 0.1f;
     // Start is called before the first frame update
     void Start()
     {
-        playerInventory = GetComponent<InventoryComponent>();
+        playerInventory = GetComponent<PlayerInventory>();
         menuController = FindObjectOfType<PanelAnim>();
         StartCoroutine(LookAt());
     }
