@@ -6,10 +6,10 @@ using UnityEngine.Rendering.Universal;
 
 public class PPEffect : MonoBehaviour
 {
-    public Slider Slider1;
+    public Slider Slider1;// UI component
     public Volume volume;
-    private Vignette vignette;
-    private ChromaticAberration chromaticAberration;
+    private Vignette vignette;//dark corners
+    private ChromaticAberration chromaticAberration; //color distortion
     void Start()
     {
         if (volume.profile.TryGet(out vignette))
@@ -22,11 +22,11 @@ public class PPEffect : MonoBehaviour
         }
         Slider1.onValueChanged.AddListener(UpdatePostProcessingEffects);
     }
-
+    //Update PP effects based on health value
     void UpdatePostProcessingEffects(float value)
     {
-        float healthPercentage = value / Slider1.maxValue;
-
+        float healthPercentage = value / Slider1.maxValue; // Calculate the percentage
+        //no incidents if hp is above 75%
         if (value > Slider1.maxValue * 0.75f)
         {
             if (vignette != null)
@@ -38,26 +38,26 @@ public class PPEffect : MonoBehaviour
                 chromaticAberration.intensity.value = 0.0f;
             }
         }
-        else if (value > Slider1.maxValue * 0.25f)
+        else if (value > Slider1.maxValue * 0.25f)//incidents if the hp value is between 25% and 75%
         {
-            if (vignette != null)
+            if (vignette != null) //Gradually increase vignette intensity from 0.2 to 0.4 as the hp decays
             {
                 vignette.intensity.value = Mathf.Lerp(0.4f, 0.2f, (value - Slider1.maxValue * 0.25f) / (Slider1.maxValue * 0.5f));
             }
-            if (chromaticAberration != null)
+            if (chromaticAberration != null)//Gradually increase chromaticAberration intensity from 0.2 to 0.4 as the hp decays
             {
                 chromaticAberration.intensity.value = Mathf.Lerp(0.6f, 0.2f, (value - Slider1.maxValue * 0.25f) / (Slider1.maxValue * 0.5f));
             }
         }
-        else
+        else //incidents if the hp value is between 25% and 75%
         {
             if (vignette != null)
             {
-                vignette.intensity.value = Mathf.Lerp(0.6f, 0.4f, value / (Slider1.maxValue * 0.25f));
+                vignette.intensity.value = Mathf.Lerp(0.6f, 0.4f, value / (Slider1.maxValue * 0.25f)); //Gradually increase vignette from 0.4 to 0.6 as the hp decays.
             }
             if (chromaticAberration != null)
             {
-                chromaticAberration.intensity.value = Mathf.Lerp(1.0f, 0.6f, value / (Slider1.maxValue * 0.25f));
+                chromaticAberration.intensity.value = Mathf.Lerp(1.0f, 0.6f, value / (Slider1.maxValue * 0.25f));//Gradually increase chromaticAberration from 0.6 to 0.1 as the hp decays.
             }
         }
     }
